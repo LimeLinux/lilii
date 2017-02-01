@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/lilii-logo.svg</file>
+        <file>images/background.png</file>
+        <file>images/back.svg</file>
+        <file>images/cancel.svg</file>
+        <file>images/forward.svg</file>
+        <file>images/apply.svg</file>
+        <file>images/users.svg</file>
+        <file>images/camera.svg</file>
+        <file>images/restart.svg</file>
+        <file>images/restart-red.svg</file>
+        <file>images/about.svg</file>
+        <file>images/release-note.svg</file>
+        <file>images/bug.svg</file>
+        <file>images/lime-logo.svg</file>
+        <file>images/welcome.svg</file>
+        <file>images/exit.svg</file>
+        <file>images/world.svg</file>
+        <file>images/keyboard.svg</file>
+        <file>images/user-avatar.svg</file>
+        <file>images/users-red.svg</file>
+        <file>images/camera-red.svg</file>
+    </qresource>
+</RCC>
