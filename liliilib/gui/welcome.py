@@ -107,11 +107,11 @@ class WelcomeWidget(QWidget):
         langComboBox.currentTextChanged.connect(self.langSelect)
 
     def langSelect(self, lang):
-        print(lang)
+        #print(lang)
         for k, v in self.lang_list.items():
             if lang == v:
                 self.parent.lilii_settings["lang"] = k
-                print(self.parent.lilii_settings, k.split(".")[0])
+                #print(self.parent.lilii_settings, k.split(".")[0])
                 translator = QTranslator(qApp)
                 translator.load("/usr/share/lilii/languages/{}.qm".format(k.split(".")[0]))
                 qApp.installTranslator(translator)
