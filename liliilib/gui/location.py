@@ -89,7 +89,9 @@ class LocationWidget(QWidget):
 
         self.cBox.addItems(zone)
 
-        self.iBox.addItems(zone_info[self.cBox.currentText()])
+        info = zone_info[self.cBox.currentText()]
+        info.sort()
+        self.iBox.addItems(info)
 
         self.parent.lilii_settings["timezone"] = "{}/{}".format(self.cBox.currentText() , self.iBox.currentText())
 
@@ -98,9 +100,10 @@ class LocationWidget(QWidget):
 
     def zoneChanged(self, zone):
         self.iBox.clear()
-        self.iBox.addItems(zone_info[self.cBox.currentText()])
+        info = zone_info[self.cBox.currentText()]
+        info.sort()
+        self.iBox.addItems(info)
         self.parent.lilii_settings["timezone"] = "{}/{}".format(self.cBox.currentText(), self.iBox.currentText())
-        #print(self.parent.lilii_settings["timezone"])
 
     def cityChanged(self, city):
         self.parent.lilii_settings["timezone"] = "{}/{}".format(self.cBox.currentText(), self.iBox.currentText())

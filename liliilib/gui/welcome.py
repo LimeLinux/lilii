@@ -19,9 +19,9 @@
 #
 #
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, qApp
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import Qt, QSize, QTranslator, QLocale
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QPushButton, qApp, QMessageBox
+from PyQt5.QtGui import QPixmap, QIcon, QDesktopServices
+from PyQt5.QtCore import Qt, QSize, QTranslator, QLocale, QUrl
 
 
 class WelcomeWidget(QWidget):
@@ -76,24 +76,24 @@ class WelcomeWidget(QWidget):
         self.layout().addLayout(linkLayout)
 
         aboutButton = QPushButton()
+        aboutButton.setFlat(True)
         aboutButton.setText(self.tr("Hakkında"))
         aboutButton.setIcon(QIcon(":/images/about.svg"))
-        aboutButton.setIconSize(QSize(18,18))
-        aboutButton.setStyleSheet("border: none;")
+        aboutButton.setIconSize(QSize(18, 18))
         linkLayout.addWidget(aboutButton)
 
         bugButton = QPushButton()
+        bugButton.setFlat(True)
         bugButton.setText(self.tr("Bilinen Hatalar"))
         bugButton.setIcon(QIcon(":/images/bug.svg"))
-        bugButton.setIconSize(QSize(18,18))
-        bugButton.setStyleSheet("border: none;")
+        bugButton.setIconSize(QSize(18, 18))
         linkLayout.addWidget(bugButton)
 
         releaseButton = QPushButton()
+        releaseButton.setFlat(True)
         releaseButton.setText(self.tr("Sürüm Notları"))
         releaseButton.setIcon(QIcon(":/images/release-note.svg"))
-        releaseButton.setIconSize(QSize(18,18))
-        releaseButton.setStyleSheet("border: none;")
+        releaseButton.setIconSize(QSize(18, 18))
         linkLayout.addWidget(releaseButton)
 
         langComboBox.addItems(["Català", "Deutsch", "English (US)", "Español", "Français", "Magyar", "Italiano",
@@ -105,13 +105,27 @@ class WelcomeWidget(QWidget):
                 self.parent.lilii_settings["lang"] = k
 
         langComboBox.currentTextChanged.connect(self.langSelect)
+        aboutButton.clicked.connect(self.aboutDialog)
+        bugButton.clicked.connect(self.bugAdressConnect)
+        releaseButton.clicked.connect(self.releaseInfoConnect)
 
     def langSelect(self, lang):
-        #print(lang)
         for k, v in self.lang_list.items():
             if lang == v:
                 self.parent.lilii_settings["lang"] = k
-                #print(self.parent.lilii_settings, k.split(".")[0])
                 translator = QTranslator(qApp)
                 translator.load("/usr/share/lilii/languages/{}.qm".format(k.split(".")[0]))
                 qApp.installTranslator(translator)
+
+    def aboutDialog(self):
+        mbox = QMessageBox.about(self, self.tr("Lilii Yükleyici Hakkında"),
+                                 self.tr("<h1>Lilii {}</h1>"
+                                         "<b>Lime Linux için Sistem Yükleyici</b>"
+                                         "<p>Copyright 2017 Metehan Özbek - <b>metehan@limelinux.com</b><br>"
+                                         "Teşekkürler: Fatih Kaya.</p>".format(qApp.applicationVersion())))
+
+    def bugAdressConnect(self):
+        QDesktopServices.openUrl(QUrl("https://github.com/mthnzbk/lilii/issues"))
+
+    def releaseInfoConnect(self):
+        QDesktopServices.openUrl(QUrl("http://limelinux.com/limelinux-indir.html"))
