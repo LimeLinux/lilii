@@ -151,10 +151,17 @@ class KeyboardWidget(QWidget):
                 for i in v:
                     self.keyboardVList.addItems(i.values())
 
+        os.system("setxkbmap -layout {} -variant \"\"".format(self.parent.lilii_settings["keyboard_layout"][0]))
+
     def keyboardTypeSelect(self, value):
-        for variant in self.variant_list.keys():
-            if variant == self.parent.lilii_settings["keyboard_layout"][0]:
-                for key in self.variant_list[variant]:
-                    print(key, list(key.keys()))
-                    if key[list(key.keys())[0]] == value:
-                        self.parent.lilii_settings["keyboard_variant"] = key, value
+        if value == "Default":
+            os.system("setxkbmap -variant \"\"")
+            self.parent.lilii_settings["keyboard_variant"] = None
+
+        else:
+            for variant in self.variant_list.keys():
+                if variant in self.parent.lilii_settings["keyboard_layout"]:
+                    for key in self.variant_list[variant]:
+                        if key[list(key.keys())[0]] == value:
+                            self.parent.lilii_settings["keyboard_variant"] = list(key.keys())[0], list(key.values())[0]
+                            os.system("setxkbmap -variant {}".format(self.parent.lilii_settings["keyboard_variant"][0]))
