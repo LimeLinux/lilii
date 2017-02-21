@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>images/lilii-logo.svg</file>
-        <file>images/background.png</file>
         <file>images/back.svg</file>
         <file>images/cancel.svg</file>
         <file>images/forward.svg</file>
@@ -21,5 +20,12 @@
         <file>images/user-avatar.svg</file>
         <file>images/users-red.svg</file>
         <file>images/camera-red.svg</file>
+        <file>images/xxx.svg</file>
+        <file>images/disk.svg</file>
+        <file>images/disk-burn.svg</file>
+        <file>images/disk-delete.svg</file>
+        <file>images/disk-space.svg</file>
+        <file>images/manuel-partition.svg</file>
+        <file>images/partitionwidget/light.svg</file>
     </qresource>
 </RCC>
