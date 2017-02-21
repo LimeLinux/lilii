@@ -21,7 +21,11 @@
 #
 
 from liliilib.gui.main import main
+import os
+import sys
 
 
 if __name__ == '__main__':
+    if os.geteuid() != 0:
+        sys.exit()
     main()
