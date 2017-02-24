@@ -20,6 +20,15 @@
 #
 
 from PIL import ImageDraw, Image
+from .parted import *
+
+
+def mbToGB(size):
+    if size < 1024:
+        return str(size)+" MB"
+    else:
+        return str(int(size)//1024)+" GB"
+
 
 def imageCrop(image):
     width, height = image.size
@@ -31,6 +40,7 @@ def imageCrop(image):
     else:
         x, y, w, h = ((height - width) // 2), 0, width, width + ((height - width) // 2)
         return x, y, w, h
+
 
 def avatarCreate(image):
     image = image.convert("RGBA")
