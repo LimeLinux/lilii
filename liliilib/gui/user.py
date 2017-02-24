@@ -254,12 +254,13 @@ class UserWidget(QWidget):
 
         select_photo.clicked.connect(self.selectPhoto)
         take_photo.clicked.connect(self.takePhoto)
-        self.showSignal.connect(self.lineEditsControl)
+        #self.showSignal.connect(self.lineEditsControl)
 
-    showSignal = pyqtSignal()
+    #showSignal = pyqtSignal()
+
     def showEvent(self, event):
-        print("asda")
-        self.showSignal.emit()
+        self.lineEditsControl()
+        #self.showSignal.emit()
 
     def autoControl(self):
         self.parent.lilii_settings["auto_login"] = self.auto_box.isChecked()
@@ -336,7 +337,6 @@ class UserWidget(QWidget):
     applyPage = pyqtSignal(bool)
 
     def lineEditsControl(self):
-        print("qweq")
         if not self.root_box.isChecked():
             if self.host_name and self.full_name and self.user_name and self.passwd and self.repasswd and self.rpasswd \
                                                                                                     and self.rrepasswd:
