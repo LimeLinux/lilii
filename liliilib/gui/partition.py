@@ -20,32 +20,43 @@
 #
 
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, QHBoxLayout, QPushButton, QSpacerItem, QSizePolicy,
-                             QFrame, QButtonGroup)
+                             QFrame, QButtonGroup, QTreeWidget, QTreeWidgetItem)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize, Qt
-from .widget.partitionwidget import LPartitionWidget
+from PyQt5.QtCore import QSize, Qt, QProcess, pyqtSignal
 from ..tools import *
+from .widget.diskeditwidget import DiskEditWidget
 
 
 class PartitionWidget(QWidget):
+
+    first_show = True
+    selected_disk = diskInfo(disksList()[0])
+    applyPage = pyqtSignal(bool)
+
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
         self.setWindowTitle(self.tr("Disk Bölümleme"))
         self.setLayout(QVBoxLayout())
 
+        self.parent.lilii_settings["/"] = None
+        self.parent.lilii_settings["/home"] = None
+
         hlayout = QHBoxLayout()
         self.layout().addLayout(hlayout)
+
+        hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
         label1 = QLabel()
         label1.setText(self.tr("Lime Linux kurulacak diski seçin: "))
         hlayout.addWidget(label1)
 
-        combo_box = QComboBox()
-        combo_box.setFixedWidth(400)
+        self.combo_box = QComboBox()
+        self.combo_box.setFixedWidth(400)
         for disk in disksList():
-            combo_box.addItem("{} - {} ({})".format(disk.model, mbToGB(disk.getSize()), disk.path))
-        hlayout.addWidget(combo_box)
+            self.combo_box.addItem("{} - {} ({})".format(disk.model, mbToGB(disk.getSize()), disk.path))
+
+        hlayout.addWidget(self.combo_box)
 
         self.label2 = QPushButton()
         self.label2.setStyleSheet("border: none;")
@@ -56,97 +67,132 @@ class PartitionWidget(QWidget):
 
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
-        self.layout().addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Maximum, QSizePolicy.Expanding))
+        self.treePartitionWidget = QTreeWidget()
+        self.layout().addWidget(self.treePartitionWidget)
 
-        vlayout = QVBoxLayout()
-        vlayout.setAlignment(Qt.AlignCenter)
-        self.layout().addLayout(vlayout)
+        header = self.treePartitionWidget.headerItem()
+        header.setText(0, self.tr("Disk Bölümü"))
+        header.setText(1, self.tr("Dosya Sistemi"))
+        header.setText(2, self.tr("Bağlama Noktası"))
+        header.setText(3, self.tr("Boyut"))
 
-        hlayout1 = QHBoxLayout()
-        hlayout2 = QHBoxLayout()
+        self.treePartitionWidget.setColumnWidth(0, 450)
+        self.treePartitionWidget.setColumnWidth(1, 150)
+        self.treePartitionWidget.setColumnWidth(2, 200)
+        self.treePartitionWidget.setColumnWidth(3, 100)
 
-        vlayout.addLayout(hlayout1)
-        vlayout.addLayout(hlayout2)
 
-        self.button_group = QButtonGroup()
+        hlayout = QHBoxLayout()
+        self.layout().addLayout(hlayout)
 
-        self.diskOnBurn = QPushButton()
-        self.diskOnBurn.setStyleSheet("text-align: left; padding-left: 10px;")
-        self.diskOnBurn.setIcon(QIcon(":/images/disk-burn.svg"))
-        self.diskOnBurn.setIconSize(QSize(32, 32))
-        self.diskOnBurn.setFixedWidth(250)
-        self.diskOnBurn.setCheckable(True)
-        self.diskOnBurn.setText(self.tr("Disk bölümü üzerine yaz."))
-        self.button_group.addButton(self.diskOnBurn)
-        hlayout1.addWidget(self.diskOnBurn)
+        hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
-        self.diskSpace = QPushButton()
-        self.diskSpace.setStyleSheet("text-align: left; padding-left: 10px;")
-        self.diskSpace.setIcon(QIcon(":/images/disk-space.svg"))
-        self.diskSpace.setIconSize(QSize(32, 32))
-        self.diskSpace.setFixedWidth(250)
-        self.diskSpace.setCheckable(True)
-        self.diskSpace.setText(self.tr("Disk alanında yer aç."))
-        self.button_group.addButton(self.diskSpace)
-        hlayout1.addWidget(self.diskSpace)
+        self.editPartitionButton = QPushButton()
+        self.editPartitionButton.setText(self.tr("Düzenle"))
+        hlayout.addWidget(self.editPartitionButton)
 
-        self.diskDeleteAndBurn = QPushButton()
-        self.diskDeleteAndBurn.setStyleSheet("text-align: left; padding-left: 10px;")
-        self.diskDeleteAndBurn.setIcon(QIcon(":/images/disk-delete.svg"))
-        self.diskDeleteAndBurn.setIconSize(QSize(32, 32))
-        self.diskDeleteAndBurn.setFixedWidth(250)
-        self.diskDeleteAndBurn.setCheckable(True)
-        self.diskDeleteAndBurn.setText(self.tr("Diski Sil ve Lime Linux Kur."))
-        self.button_group.addButton(self.diskDeleteAndBurn)
-        hlayout2.addWidget(self.diskDeleteAndBurn)
+        self.zeroPartitionButton = QPushButton()
+        self.zeroPartitionButton.setText(self.tr("Sıfırla"))
+        hlayout.addWidget(self.zeroPartitionButton)
 
-        self.diskManuelPartition = QPushButton()
-        self.diskManuelPartition.setStyleSheet("text-align: left; padding-left: 10px;")
-        self.diskManuelPartition.setIcon(QIcon(":/images/manuel-partition.svg"))
-        self.diskManuelPartition.setIconSize(QSize(32, 32))
-        self.diskManuelPartition.setFixedWidth(250)
-        self.diskManuelPartition.setCheckable(True)
-        self.diskManuelPartition.setText(self.tr("Elle Bölümle."))
-        self.button_group.addButton(self.diskManuelPartition)
-        hlayout2.addWidget(self.diskManuelPartition)
 
-        self.layout().addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Maximum, QSizePolicy.Expanding))
 
-        self.line = QFrame()
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-        self.layout().addWidget(self.line)
+        if not is_efi():
+            hlayout = QHBoxLayout()
+            self.layout().addLayout(hlayout)
 
-        self.infoLabel = QLabel()
-        self.infoLabel.hide()
-        self.layout().addWidget(self.infoLabel)
+            hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
-        self.partitionwidget = LPartitionWidget(self)
-        self.partitionwidget.setDisk(diskInfo(disksList()[0]))
-        self.layout().addWidget(self.partitionwidget)
+            bootLabel = QLabel()
+            bootLabel.setText(self.tr("Ön yükleyiciyi şuraya kur:"))
+            hlayout.addWidget(bootLabel)
 
-        self.partitionwidget2 = LPartitionWidget(self)
-        self.partitionwidget2.hide()
-        self.partitionwidget2.setDisk(diskInfo(disksList()[0]))
-        self.layout().addWidget(self.partitionwidget2)
+            self.combo_box2 = QComboBox()
+            self.combo_box2.setFixedWidth(400)
+            for disk in disksList():
+                self.combo_box2.addItem("{} - {} ({})".format(disk.model, mbToGB(disk.getSize()), disk.path))
 
-        combo_box.currentIndexChanged.connect(self.diskSelect)
-        self.button_group.buttonClicked.connect(self.diskOnBurnSelect)
+            self.parent.lilii_settings["bootloader"] = disksList()[0].path
+            hlayout.addWidget(self.combo_box2)
+
+            hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
+            self.combo_box2.currentIndexChanged.connect(self.bootloaderDiskSelect)
+
+
+            self.parent.lilii_settings["/boot"] = None
+
+        else:
+            self.parent.lilii_settings["/boot/efi"] = None
+
+        self.editPartitionButton.clicked.connect(self.diskConnect)
+        self.combo_box.currentIndexChanged.connect(self.diskSelect)
+        self.zeroPartitionButton.clicked.connect(self.diskPartitionClear)
+
+        self.diskPartitionList(diskInfo(disksList()[self.combo_box.currentIndex()]))
+
 
     def diskSelect(self, index):
         self.label2.setText("{}".format(diskType(disksList()[index])))
-        self.partitionwidget.setDisk(diskInfo(disksList()[index]))
+        self.selected_disk = diskInfo(disksList()[0])
+        self.diskPartitionList(diskInfo(disksList()[self.combo_box.currentIndex()]))
 
-    def diskOnBurnSelect(self, state):
-        self.infoLabel.show()
-        if self.diskOnBurn == state:
-            self.infoLabel.setText(self.tr("<b>Yükleyeceğin disk bölümünü seç:</b>"))
+    def bootloaderDiskSelect(self, index):
+        self.parent.lilii_settings["bootloader"] = disksList()[index].path
 
-        elif self.diskSpace == state:
-            self.infoLabel.setText(self.tr("<b>Küçültmek için bir bölüm seçin ve boyutlandırın</b>"))
+    def diskPartitionClear(self):
+        for index in list(range(self.treePartitionWidget.topLevelItemCount())):
+            item = self.treePartitionWidget.topLevelItem(index)
+            item.setText(2, "")
 
-        elif self.diskDeleteAndBurn == state:
-            self.infoLabel.hide()
+        self.parent.lilii_settings["/"] = None
+        self.parent.lilii_settings["/home"] = None
 
-        elif self.diskManuelPartition == state:
-            self.infoLabel.hide()
+        if is_efi():
+            self.parent.lilii_settings["/boot/efi"] = None
+
+        else:
+            self.parent.lilii_settings["/boot"] = None
+
+        self.partitionSelectControl()
+
+    def diskPartitionList(self, disk):
+        self.treePartitionWidget.clear()
+        for partition in disk.partitions:
+            try:
+                part_item = QTreeWidgetItem()
+                part_item.setText(0, partition.path)
+                part_item.setText(1, partition.fileSystem.type)
+                part_item.setText(2, "")
+                part_item.setText(3, mbToGB(partition.getSize()))
+                self.treePartitionWidget.addTopLevelItem(part_item)
+
+            except AttributeError:
+                part_item = QTreeWidgetItem()
+                part_item.setText(0, partition.path)
+                part_item.setText(1, self.tr("Bilinmiyor"))
+                part_item.setText(2, "")
+                part_item.setText(3, mbToGB(partition.getSize()))
+                self.treePartitionWidget.addTopLevelItem(part_item)
+
+    def diskConnect(self):
+        if self.treePartitionWidget.selectedItems():
+            item = self.treePartitionWidget.selectedItems()[0]
+            disk = DiskEditWidget(self)
+            disk.partition = item
+            disk.exec_()
+
+
+    def showEvent(self, event):
+        if self.first_show:
+            QProcess.startDetached("sudo gparted")
+            self.first_show = False
+
+        self.partitionSelectControl()
+
+    def partitionSelectControl(self):
+        if self.parent.lilii_settings["/"] != None:
+            if is_efi() and self.parent.lilii_settings["/boot/efi"] != None:
+                self.applyPage.emit(True)
+
+        else:
+            self.applyPage.emit(False)
