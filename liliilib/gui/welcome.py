@@ -122,7 +122,7 @@ class WelcomeWidget(QWidget):
                                  self.tr("<h1>Lilii {}</h1>"
                                          "<b>Lime Linux için Sistem Yükleyici</b>"
                                          "<p>Copyright 2017 Metehan Özbek - <b>metehan@limelinux.com</b><br>"
-                                         "Teşekkürler: Fatih Kaya.</p>".format(qApp.applicationVersion())))
+                                         "Teşekkürler: Fatih Kaya - <b>trlinux41@gmail.com</b></p>".format(qApp.applicationVersion())))
 
     def bugAdressConnect(self):
         QDesktopServices.openUrl(QUrl("https://github.com/mthnzbk/lilii/issues"))
