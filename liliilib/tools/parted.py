@@ -21,9 +21,6 @@
 
 import parted
 
-MIN_SIZE = 1024*8
-BOOT_SIZE = 300
-
 
 def disksList():
     return parted.getAllDevices()
@@ -35,3 +32,4 @@ def diskInfo(disk):
 
 def diskType(disk):
     return parted.Disk(disk).type.upper()
+
