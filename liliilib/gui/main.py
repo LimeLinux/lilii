@@ -168,9 +168,9 @@ class MainWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.resize(950, 580)
-        self.setWindowTitle(self.tr("Lime Linux Yükleyicisi"))
+        self.setWindowTitle(self.tr("Lime Linux Sistem Yükleyicisi"))
         self.setWindowIcon(QIcon(":/images/lilii-logo.svg"))
-        self.setWindowFlags(Qt.WindowTitleHint|Qt.WindowStaysOnTopHint|Qt.WindowMinimizeButtonHint)
+        self.setWindowFlags(Qt.WindowTitleHint|Qt.WindowMinimizeButtonHint) #Qt.WindowStaysOnTopHint
 
         x, y = (QDesktopWidget().width()-self.width())/2, (QDesktopWidget().availableGeometry().height()-self.height())/2
         self.move(x, y)
@@ -197,6 +197,7 @@ class MainWindow(QWidget):
 
         self.footerWidget.cancelButton.clicked.connect(self.close)
         self.wizardWidget.widget(4).applyPage.connect(self.footerWidget.continueButton.setEnabled)
+        self.wizardWidget.widget(3).applyPage.connect(self.footerWidget.continueButton.setEnabled)
 
     def closeEvent(self, event):
         pass
