@@ -21,6 +21,7 @@
 
 from PIL import ImageDraw, Image
 from .parted import *
+import os
 
 
 def mbToGB(size):
@@ -54,3 +55,7 @@ def avatarCreate(image):
     avatar.paste(image, mask=im)
 
     return avatar
+
+
+def is_efi():
+    return os.path.isdir("/sys/firmware/efi")
