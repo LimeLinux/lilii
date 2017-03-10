@@ -20,7 +20,7 @@
 #
 
 from PyQt5.QtWidgets import (QWidget, QApplication, QStackedWidget, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy,
-                             QPushButton, QDesktopWidget, QLabel, qApp)
+                             QPushButton, QDesktopWidget, QLabel, qApp, QMessageBox)
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt, QObject, QTranslator, QLocale, pyqtSignal
 from PyQt5.QtNetwork import QLocalServer, QLocalSocket
@@ -135,9 +135,18 @@ class FooterWidget(QWidget):
         self.parent.currentChanged.connect(self.buttonStatus)
         self.continueButton.clicked.connect(self.nextWidget)
         self.backButton.clicked.connect(self.proviousWidget)
+        self.cancelButton.clicked.connect(self.cancelQuestion)
 
         if self.parent.currentIndex() == 0:
             self.backButton.setDisabled(True)
+
+    def cancelQuestion(self):
+        question = QMessageBox.question(self, self.tr("Vazgeçmek mi istiyorsun?"),
+                                        self.tr("Lime Linux Sistem Yükleyicisi'nden çıkmak istiyor musunuz?"))
+
+        if question == QMessageBox.Yes:
+            qApp.quit()
+
 
     def buttonStatus(self, current):
         self.backButton.setEnabled(True)
@@ -152,7 +161,19 @@ class FooterWidget(QWidget):
             self.cancelButton.setDisabled(True)
 
     def nextWidget(self):
-        self.parent.setCurrentIndex(self.parent.currentIndex()+1)
+        if self.parent.currentIndex() == 5:
+            warning = QMessageBox.warning(self, self.tr("Dikkat Edin!"), self.tr("Sonraki adımda kurulum başlayacak ve "
+                                                                                  "bu adımda belirtilen işlemler sisteminize "
+                                                                                  "uygulanacaktır."),
+                                          QMessageBox.Yes|QMessageBox.No)
+
+            if warning == QMessageBox.Yes:
+                self.parent.setCurrentIndex(self.parent.currentIndex() + 1)
+
+            else: pass
+
+        else:
+            self.parent.setCurrentIndex(self.parent.currentIndex()+1)
 
     def proviousWidget(self):
         self.parent.setCurrentIndex(self.parent.currentIndex() - 1)
@@ -200,11 +221,16 @@ class MainWindow(QWidget):
         self.wizardWidget.widget(3).applyPage.connect(self.footerWidget.continueButton.setEnabled)
 
     def closeEvent(self, event):
-        pass
+        if not qApp.quitOnLastWindowClosed():
+            event.ignore()
+
+        else:
+            event.accept()
 
 
 def main():
     app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
     app.setApplicationVersion("1.0 Alpha")
     locale = QLocale.system().name()
     translator = QTranslator(app)
