@@ -96,15 +96,16 @@ class InstallWidget(QWidget):
         self.progress.setMaximum(0)
 
     def showEvent(self, event):
+        self.slide_widget.startSlide()
+        self.applyPage.emit(False)
+
         self.install_thread = Install(self)
         self.install_thread.finished.connect(self.finish)
         self.install_thread.total.connect(self.progress.setMaximum)
         self.install_thread.percent.connect(self.progress.setValue)
-        self.install_thread.unpack_finish.connect()
+        self.install_thread.unpack_finish.connect(self.other_process)
 
-        self.slide_widget.startSlide()
         self.install_thread.start()
-        self.applyPage.emit(False)
 
 
 class Install(QThread):
@@ -151,10 +152,10 @@ class Install(QThread):
         self.rootpasswd = None
 
         if self.is_rootpasswd:
-            self.rootpasswd = self.parent.parent.lilii_settings["root_pass"]
+            self.rootpasswd = self.parent.parent.lilii_settings["password"]
 
         else:
-            self.rootpasswd = self.parent.parent.lilii_settings["password"]
+            self.rootpasswd = self.parent.parent.lilii_settings["root_pass"]
 
 
     def set_mount(self):
