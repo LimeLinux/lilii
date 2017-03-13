@@ -204,6 +204,7 @@ class UserWidget(QWidget):
         self.photo_label.setFixedSize(192, 192)
         self.photo_label.setScaledContents(True)
         self.photo_label.setPixmap(QPixmap(":/images/user-avatar.svg"))
+        self.parent.lilii_settings["avatar"] = None
         right_layout.addWidget(self.photo_label)
 
         button_layout = QHBoxLayout()
@@ -373,7 +374,6 @@ class UserWidget(QWidget):
             crop_image = image.crop(imageCrop(image))
             new_image = avatarCreate(crop_image)
             new_image.save(avatar_path, "PNG")
-            self.parent.lilii_settings["avatar"] = avatar_path
             self.photo_label.setPixmap(QPixmap(avatar_path))
 
             self.parent.lilii_settings["avatar"] = True
