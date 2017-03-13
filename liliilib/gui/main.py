@@ -160,6 +160,10 @@ class FooterWidget(QWidget):
             self.backButton.setDisabled(True)
             self.cancelButton.setDisabled(True)
 
+        if current == 6:
+            self.backButton.setDisabled(True)
+            self.cancelButton.setDisabled(True)
+
     def nextWidget(self):
         if self.parent.currentIndex() == 5:
             warning = QMessageBox.warning(self, self.tr("Dikkat Edin!"), self.tr("Sonraki adımda kurulum başlayacak ve "
@@ -219,6 +223,7 @@ class MainWindow(QWidget):
         self.footerWidget.cancelButton.clicked.connect(self.close)
         self.wizardWidget.widget(4).applyPage.connect(self.footerWidget.continueButton.setEnabled)
         self.wizardWidget.widget(3).applyPage.connect(self.footerWidget.continueButton.setEnabled)
+        self.wizardWidget.widget(6).applyPage.connect(self.footerWidget.continueButton.setEnabled)
 
     def closeEvent(self, event):
         if not qApp.quitOnLastWindowClosed():

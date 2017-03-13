@@ -19,23 +19,413 @@
 #
 #
 
-from PyQt5.QtWidgets import QWidget, QProgressBar, QLabel, QStackedWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QProgressBar, QLabel, QVBoxLayout
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from .widget.slidewidget import Slide, SlideWidget
+from ..tools import is_efi
+import os
+import subprocess
+import shutil
 
+
+"""
+blkid ille fstab için UUID tespit edilir. UUID=815d46ef-fdd0-4bd5-b4ac-13a4b37165d5 swap swap defaults 0 0
+
+"""
 
 class InstallWidget(QWidget):
+
+    applyPage = pyqtSignal(bool)
+
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
         self.setWindowTitle(self.tr("Sistem Yüklemesi"))
         self.setLayout(QVBoxLayout())
 
-        slide_widget = QStackedWidget()
-        self.layout().addWidget(slide_widget)
+        self.slide_widget = SlideWidget()
+        self.layout().addWidget(self.slide_widget)
 
-        progress = QProgressBar()
-        progress.setValue(35)
-        self.layout().addWidget(progress)
+        self.progress = QProgressBar()
+        self.layout().addWidget(self.progress)
 
-        desc_label = QLabel()
-        desc_label.setText(self.tr("Yükleniyor"))
-        self.layout().addWidget(desc_label)
+        self.desc_label = QLabel()
+        self.desc_label.setAlignment(Qt.AlignCenter)
+        self.layout().addWidget(self.desc_label)
+
+        self.addSlides()
+
+
+
+    def addSlides(self):
+        slide1 = Slide()
+        slide1.setResource(":/images/about.svg")
+        slide1.setDescription(self.tr("Deneme 1"))
+        self.slide_widget.addWidget(slide1)
+
+        slide2 = Slide()
+        slide2.setResource(":/images/apply.svg")
+        slide2.setDescription(self.tr("Deneme 2"))
+        self.slide_widget.addWidget(slide2)
+
+        slide3 = Slide()
+        slide3.setResource(":/images/back.svg")
+        slide3.setDescription(self.tr("Deneme 3"))
+        self.slide_widget.addWidget(slide3)
+
+        slide4 = Slide()
+        slide4.setResource(":/images/camera.svg")
+        slide4.setDescription(self.tr("Deneme 4"))
+        self.slide_widget.addWidget(slide4)
+
+        slide5 = Slide()
+        slide5.setResource(":/images/disk.svg")
+        slide5.setDescription(self.tr("Deneme 5"))
+        self.slide_widget.addWidget(slide5)
+
+        slide6 = Slide()
+        slide6.setResource(":/images/exit.svg")
+        slide6.setDescription(self.tr("Deneme 6"))
+        self.slide_widget.addWidget(slide6)
+
+    def finish(self):
+        self.applyPage.emit(True)
+
+    def other_process(self):
+        self.progress.setMinimum(0)
+        self.progress.setMaximum(0)
+
+    def showEvent(self, event):
+        self.install_thread = Install(self)
+        self.install_thread.finished.connect(self.finish)
+        self.install_thread.total.connect(self.progress.setMaximum)
+        self.install_thread.percent.connect(self.progress.setValue)
+        self.install_thread.unpack_finish.connect()
+
+        self.slide_widget.startSlide()
+        self.install_thread.start()
+        self.applyPage.emit(False)
+
+
+class Install(QThread):
+
+    total = pyqtSignal(int)
+    percent = pyqtSignal(int)
+    unpack_finish = pyqtSignal()
+
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+
+        self.rootfs_path = "/bootmnt/pisi/x86_64/rootfs.sqfs"
+        self.desktopfs_path = "/bootmnt/pisi/x86_64/desktop.sqfs"
+
+        self.mount_path = "/mnt/lime"
+
+        self.hostname = self.parent.parent.lilii_settings["hostname"]
+        self.locale = self.parent.parent.lilii_settings["lang"]
+        self.timezone = self.parent.parent.lilii_settings["timezone"]
+        self.keyboard_model = self.parent.parent.lilii_settings["keyboard_model"][0] # pc105
+        self.keyboard_variant = self.parent.parent.lilii_settings["keyboard_variant"] #q = None - f
+        self.keyboard_layout = self.parent.parent.lilii_settings["keyboard_layout"][0] #tr
+        self.root_disk = self.parent.parent.lilii_settings["/"]
+        self.home_disk = self.parent.parent.lilii_settings["/home"]
+
+        self.boot_disk = None
+
+        if is_efi():
+            self.boot_disk = self.parent.parent.lilii_settings["/boot/efi"]
+
+        else:
+            self.boot_disk = self.parent.parent.lilii_settings["/boot"]
+            self.bootloader = self.parent.parent.lilii_settings["bootloader"]
+
+        self.username = self.parent.parent.lilii_settings["username"]
+        self.realname = self.parent.parent.lilii_settings["fullname"]
+        self.userpaswd = self.parent.parent.lilii_settings["password"]
+        self.is_rootpasswd = self.parent.parent.lilii_settings["root_user"]
+        self.autologin = self.parent.parent.lilii_settings["auto_login"]
+        self.useravatar = self.parent.parent.lilii_settings["avatar"]
+        self.liveuser = os.environ["USER"]
+
+        self.rootpasswd = None
+
+        if self.is_rootpasswd:
+            self.rootpasswd = self.parent.parent.lilii_settings["root_pass"]
+
+        else:
+            self.rootpasswd = self.parent.parent.lilii_settings["password"]
+
+
+    def set_mount(self):
+        #os.system("mkdir {}".format(self.mount_path+"/rootfs"))
+        #os.system("mkdir {}".format(self.mount_path + "/desktop"))
+        os.system("mount -t squashfs -o {} {}".format(self.rootfs_path, self.mount_path+"/rootfs"))
+        os.system("mount -t squashfs -o {} {}".format(self.desktopfs_path, self.mount_path + "/desktop"))
+
+        #root dizinini bağla.
+        os.system("mount -t {} {}".format(self.root_disk, self.mount_path+"/root"))
+
+
+    def set_unpack(self):
+        self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
+        def dirs_and_files(dir):
+            dirs_list = []
+            files_list = []
+
+            for top, middle, bottom in os.walk(dir):
+                if bottom == [] and top[len(dir):] != "":
+                    dirs_list.append(top[len(dir):])
+
+                else:
+                    for file in bottom:
+                        files_list.append(os.path.join(top[len(dir):], file))
+
+            return dirs_list, files_list
+
+        rootfs_dirs, rootfs_files = dirs_and_files(self.mount_path+"/rootfs")
+        desktop_dirs, desktop_files = dirs_and_files(self.mount_path + "/desktop")
+
+        self.total.emit(len(rootfs_dirs)+len(rootfs_files)+len(desktop_dirs)+len(desktop_files))
+
+        percent = 0
+        for dir in rootfs_dirs:
+            os.makedirs(self.mount_path+"/root"+dir, exist_ok=True)
+            percent += 1
+            self.percent.emit(percent)
+
+        for file in rootfs_files:
+            shutil.copy(self.mount_path+"/rootfs"+file, self.mount_path+"/root"+file)
+            percent += 1
+            self.percent.emit(percent)
+
+        for dir in desktop_dirs:
+            os.makedirs(self.mount_path + "/root" + dir, exist_ok=True)
+            percent += 1
+            self.percent.emit(percent)
+
+        for file in desktop_files:
+            shutil.copy(self.mount_path + "/desktop" + file, self.mount_path + "/root" + file)
+            percent += 1
+            self.percent.emit(percent)
+
+        self.unpack_finish.emit()
+
+    def set_chroot(self):
+        os.system("mount --bind /dev/ {}/dev/".format(self.mount_path))
+        os.system("mount --bind /dev/shm {}/dev/shm".format(self.mount_path))
+        os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path))
+        os.system("mount --bind /sys/ {}/sys/".format(self.mount_path))
+        os.system("mount --bind /proc/ {}/proc/".format(self.mount_path))
+
+    def set_fstab(self):
+
+        def fstab_parse():
+            device_list = []
+            blkid_output = subprocess.Popen("blkid", stdout=subprocess.PIPE)
+            output = blkid_output.stdout.read()
+
+            for o in output.split("\n"):
+                device = []
+                for i in o.split():
+                    if i.startswith("/dev"):
+                        device.append(i[:-1])
+
+                    elif i.startswith("UUID="):
+                        device.append(i[6:-1])
+
+                    elif i.startswith("TYPE="):
+                        device.append(i[6:-1])
+
+
+                device_list.append(device)
+
+            return device_list
+
+        with open(self.mount_path+"/etc/fstab", "a") as fstab_file:
+            for device in fstab_parse():
+
+                if self.root_disk == device[0]:
+                    fstab_file.write('UUID="{}"\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
+
+                elif self.home_disk == device[0]:
+                    fstab_file.write('UUID="{}"\t /home \t\t {} \t defaults\t0\t0'.format(device[1], device[2]))
+
+                elif self.boot_disk == device[0]:
+                    if is_efi():
+                        fstab_file.write('UUID="{}"\t /boot/efi \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
+
+                    else:
+                        fstab_file.write('UUID="{}"\t /boot \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
+
+                elif device[1] == "swap":
+                    fstab_file.write('UUID="{}"\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
+
+    def set_locale(self):
+        "LANG=tr_TR.UTF-8"
+        with open(self.mount_path+"/etc/locale.conf", "w") as locale:
+            locale.write("LANG={}".format(self.locale))
+            locale.flush()
+            locale.close()
+
+        # with open(self.mount_path+"/etc/environment", "a") as env:
+        #     env.write("LANG={}".format(self.locale))
+        #     env.flush()
+        #     env.close()
+
+    def set_timezone(self):
+        self.chroot_command("ln -s /usr/share/zoneinfo/{} /etc/localtime".format(self.timezone))
+
+    def set_host(self):
+        hosts_text = "# /etc/hosts\n"\
+                     "#\n"\
+                     "# This file describes a number of hostname-to-address\n"\
+                     "# mappings for the TCP/IP subsystem.  It is mostly\n"\
+                     "# used at boot time, when no name servers are running.\n"\
+                     "# On small systems, this file can be used instead of a\n"\
+                     "# \"named\" name server.  Just add the names, addresses\n"\
+                     "# and any aliases to this file...\n"\
+                     "#\n"\
+                     "\n"\
+                     "127.0.0.1   localhost      {}\n"\
+                     "\n"\
+                     "# IPV6 versions of localhost and co\n"\
+                     "::1     localhost ip6-localhost ip6-loopback\n"\
+                     "fe00::0 ip6-localnet\n"\
+                     "ff00::0 ip6-mcastprefix\n"\
+                     "ff02::1 ip6-allnodes\n"\
+                     "ff02::2 ip6-allrouters\n"\
+                     "ff02::3 ip6-allhosts\n".format(self.hostname)
+
+        with open(self.mount_path+"/etc/hostname", "w") as hostname:
+            hostname.write(self.hostname)
+            hostname.flush()
+            hostname.close()
+
+        with open(self.mount_path+"/etc/hosts", "w") as hosts:
+            hosts.write(hosts_text)
+            hosts.flush()
+            hosts.close()
+
+    def set_keyboard(self):
+        if not self.keyboard_variant:
+            self.keyboard_variant = ""
+
+        keyboard = "Section \"InputClass\"\n"\
+                   "\t\tIdentifier \"system-keyboard\"\n"\
+                   "\t\tMatchIsKeyboard \"on\"\n"\
+                   "\t\tOption \"XkbModel\" \"{}\"\n"\
+                   "\t\tOption \"XkbLayout\" \"{}\"\n"\
+                   "\t\tOption \"XkbVariant\" \"{}\"\n"\
+                   "EndSection\n".format(self.keyboard_model, self.keyboard_layout, self.keyboard_variant)
+
+        with open(self.mount_path+"/etc/X11/xorg.conf.d/10-keyboard.conf", "w") as keyboard_conf:
+            keyboard_conf.write(keyboard)
+            keyboard_conf.flush()
+            keyboard_conf.close()
+
+        self.chroot_command("locale-gen")
+
+    def set_initcpio(self):
+        self.chroot_command("mkinitcpio -p linux")
+
+    def set_sudoers(self):
+        sudoers = "# to use special input methods. This may allow users to compromise  the root\n"\
+                  "# account if they are allowed to run commands without authentication.\n"\
+                  "#Defaults env_keep = \"LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT "\
+                  "LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS "\
+                  "XDG_SESSION_COOKIE XMODIFIERS GTK_IM_MODULEQT_IM_MODULE QT_IM_SWITCHER\"\n"\
+                  "\n"\
+                  "# User privilege specification\n"\
+                  "root    ALL=(ALL) ALL\n"\
+                  "\n"\
+                  "# Uncomment to allow people in group wheel to run all commands\n"\
+                  "%wheel  ALL=(ALL)       ALL\n"\
+                  "\n"\
+                  "# Same thing without a password\n"\
+                  "#%wheel ALL=(ALL)       NOPASSWD: ALL\n"\
+                  "{}    ALL=(ALL)       ALL".format(self.username)
+
+        with open(self.mount_path+"/etc/sudoers", "w") as sudoers_file:
+            sudoers_file.write(sudoers)
+            sudoers_file.flush()
+            sudoers_file.close()
+
+    def remove_user(self):
+        self.chroot_command("userdel -r {}".format(self.liveuser))
+
+        if os.path.exists(self.mount_path+"/home/{}".format(self.liveuser)):
+            self.chroot_command("rm -rf /home/{}".format(self.liveuser))
+
+    def add_user(self):
+        with open(self.mount_path+"/tmp/user.conf", "w") as user:
+            user.write("{}:{}".format(self.username, self.userpaswd))
+            user.write("{}:{}".format("root", self.rootpasswd))
+
+        groups_user, groups_root = "-G sudo,audio,video,cdrom", "-G audio,video,cdrom" # ???
+        self.chroot_command("useradd -s {} -c '{}' {} -m {}".format("/bin/bash", self.realname, groups_user, self.username))
+        self.chroot_command("cat /tmp/user.conf | chpasswd")  # kullanıcı şifresi belirtmek için.
+        self.chroot_command("rm -rf /tmp/user.conf")
+
+        #self.chroot_command("passwd -d root") #su ile giriş yapmayı engelliyor gibi. sudo su çalışıyor.
+
+        if self.useravatar:
+            shutil.copy(os.environ["HOME"]+"/.face.icon", self.mount_path+"/root"+"/home/{}".format(self.username))
+
+    def set_displaymanager(self):
+        #lightdm
+        conf_data = []
+        path = self.mount_path+"/etc/lightdm/lightdm.conf"
+        with open(path) as conf:
+            for text in conf.readlines():
+                if text.startswith("#autologin-user="):
+                    conf_data.append("autologin-user={}\n".format(self.username))
+
+                else:
+                    conf_data.append(text)
+
+        with open(path, "w") as conf:
+            conf.write("".join(conf_data))
+
+    def set_network(self): pass
+
+    def set_grupcfg(self): pass
+
+    def install_bootloader(self):
+        self.chroot_command("grub2-install")
+        self.chroot_command("grub2-mkconfig  /boot/grub2/grub.cfg")
+
+    def set_umount(self):
+        os.system("umount {}".format(self.mount_path + "/rootfs"))
+        os.system("umount {}".format(self.mount_path + "/desktop"))
+        os.system("umount {}".format(self.mount_path + "/root"))
+
+        os.system("mount --force {}/dev/".format(self.mount_path))
+        os.system("mount --force {}/dev/shm".format(self.mount_path))
+        os.system("mount --force {}/dev/pts".format(self.mount_path))
+        os.system("mount --force {}/sys/".format(self.mount_path))
+        os.system("mount --force {}/proc/".format(self.mount_path))
+
+    def chroot_command(self, command):
+        os.system("chroot {} /bin/sh -c \"{}\"".format(self.mount_path, command))
+
+    def run(self):
+        self.set_mount()
+        self.set_unpack()
+        self.parent.desc_label.setText(self.tr("Sistem yapılandırılıyor..."))
+        self.set_chroot()
+        self.set_fstab()
+        self.set_timezone()
+        self.set_locale()
+        self.set_host()
+        self.set_keyboard()
+        self.remove_user()
+        self.add_user()
+        self.set_network() #boş
+        self.set_grupcfg() #boş
+        self.set_displaymanager()
+        self.install_bootloader()
+        self.set_initcpio()
+        self.set_umount()
+        self.parent.desc_label.setText(self.tr("Sistem kuruldu."))
+        self.msleep(2000)
