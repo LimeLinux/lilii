@@ -33,17 +33,16 @@ for l in listdir('languages'):
 system('pyrcc5 lilii.qrc -o liliilib/resource.py')
 
 datas = [('/usr/share/applications', ['data/lilii.desktop']),
-         #('/etc/skel/.config/autostart', ['data/lime-welcome.desktop']),
-         ('/usr/share/icons/hicolor/scalable/apps', ['images/lilii.svg']),
+         #('/etc/skel/.config/autostart', ['data/lilii.desktop']),
+         ('/usr/share/icons/hicolor/scalable/apps', ['images/lilii-logo.svg']),
          ('/usr/share/lilii/languages', langs),
-         #('/usr/share/welcome/data', ["data/pisilinux-2-0-kurulum-belgesi.pdf", "data/lime-welcome.desktop"])
          ]
 
 setup(
     name = "lilii",
     scripts = ["lilii"],
     packages = find_packages(),
-    version = "1.0",
+    version = "1.0 Alpha",
     license = "GPL v3",
     description = "Lime Linux System Installer",
     author = "Metehan Özbek",
