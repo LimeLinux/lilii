@@ -21,12 +21,12 @@
 
 from setuptools import setup, find_packages
 from os import listdir, system
-
+import glob
 
 langs = []
 for l in listdir('languages'):
     if l.endswith('ts'):
-        system('lrelease-qt5 languages/%s' % l)
+        system('lrelease languages/%s' % l)
         langs.append(('languages/%s' % l).replace('.ts', '.qm'))
 
 
@@ -36,6 +36,7 @@ datas = [('/usr/share/applications', ['data/lilii.desktop']),
          #('/etc/skel/.config/autostart', ['data/lilii.desktop']),
          ('/usr/share/icons/hicolor/scalable/apps', ['images/lilii-logo.svg']),
          ('/usr/share/lilii/languages', langs),
+         ('/usr/share/lilii/data', glob.glob("data/*.json"))
          ]
 
 setup(
