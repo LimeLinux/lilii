@@ -243,7 +243,7 @@ class Install(QThread):
 
             return device_list
 
-        with open(self.mount_path+"/etc/fstab", "a") as fstab_file:
+        with open(self.mount_path+"/root"+"/etc/fstab", "a") as fstab_file:
             for device in fstab_parse():
 
                 if self.root_disk == device[0]:
