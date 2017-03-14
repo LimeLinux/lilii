@@ -29,7 +29,7 @@ import os
 zone = set()
 
 if os.path.isfile("/usr/share/lilii/data/zone.json"):
-    zone_info = json.loads("/usr/share/lilii/data/zone.json")
+    zone_info = json.loads(open("/usr/share/lilii/data/zone.json").read())
 
     for k, v in zone_info:
         zone.add(k)
