@@ -31,18 +31,7 @@ zone = set()
 if os.path.isfile("/usr/share/lilii/data/zone.json"):
     zone_info = json.loads("/usr/share/lilii/data/zone.json")
 
-    zone = set()
-
     for k, v in zone_info:
-        zone.add(k)
-
-## testing
-if os.path.isfile("/home/metehan/PycharmProjects/lilii/data/zone.json"):
-    zone_info = json.loads(open("/home/metehan/PycharmProjects/lilii/data/zone.json").read())
-
-
-
-    for k, v in zone_info.items():
         zone.add(k)
 
 zone = list(zone)

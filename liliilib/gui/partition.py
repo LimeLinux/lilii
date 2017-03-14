@@ -194,5 +194,8 @@ class PartitionWidget(QWidget):
             if is_efi() and self.parent.lilii_settings["/boot/efi"] != None:
                 self.applyPage.emit(True)
 
+            elif not is_efi():
+                self.applyPage.emit(True)
+
         else:
             self.applyPage.emit(False)
