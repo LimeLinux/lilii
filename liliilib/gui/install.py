@@ -159,8 +159,8 @@ class Install(QThread):
 
 
     def set_mount(self):
-        #os.system("mkdir {}".format(self.mount_path+"/rootfs"))
-        #os.system("mkdir {}".format(self.mount_path + "/desktop"))
+        os.makedirs(self.mount_path+"/rootfs", exist_ok=True)
+        os.makedirs(self.mount_path + "/desktop", exist_ok=True)
         os.system("mount -t squashfs -o {} {}".format(self.rootfs_path, self.mount_path+"/rootfs"))
         os.system("mount -t squashfs -o {} {}".format(self.desktopfs_path, self.mount_path + "/desktop"))
 
