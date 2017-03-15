@@ -91,10 +91,6 @@ class InstallWidget(QWidget):
     def finish(self):
         self.applyPage.emit(True)
 
-    def other_process(self):
-        self.progress.setMinimum(0)
-        self.progress.setMaximum(0)
-
     def showEvent(self, event):
         self.slide_widget.startSlide()
         self.applyPage.emit(False)
@@ -103,7 +99,6 @@ class InstallWidget(QWidget):
         self.install_thread.finished.connect(self.finish)
         self.install_thread.total.connect(self.progress.setMaximum)
         self.install_thread.percent.connect(self.progress.setValue)
-        self.install_thread.unpack_finish.connect(self.other_process)
 
         self.install_thread.start()
 
@@ -112,7 +107,7 @@ class Install(QThread):
 
     total = pyqtSignal(int)
     percent = pyqtSignal(int)
-    unpack_finish = pyqtSignal()
+    __percent = 0
 
     def __init__(self, parent):
         super().__init__()
@@ -167,59 +162,19 @@ class Install(QThread):
         #root dizinini bağla.
         os.makedirs(self.mount_path + "/root", exist_ok=True)
         os.system("mount {} {} -o loop".format(self.root_disk, self.mount_path+"/root"))
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
 
     def set_unpack(self):
         self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
-        def copy(src, dst):
-            if os.path.islink(src):
-                linkto = os.readlink(src)
-                os.symlink(linkto, dst)
-            else:
-                shutil.copy(src, dst)
+        subprocess.call(["unsquashfs", "-d", "-f", self.mount_path+"/root", self.rootfs_path], stdout=subprocess.PIPE)
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
-        def dirs_and_files(dir):
-            dirs_list = []
-            files_list = []
-
-            for top, middle, bottom in os.walk(dir):
-                if bottom == [] and top[len(dir):] != "":
-                    dirs_list.append(top[len(dir):])
-
-                else:
-                    dirs_list.append(top[len(dir):])
-                    for file in bottom:
-                        files_list.append(os.path.join(top[len(dir):], file))
-
-            return dirs_list, files_list
-
-        rootfs_dirs, rootfs_files = dirs_and_files(self.mount_path+"/rootfs")
-        desktop_dirs, desktop_files = dirs_and_files(self.mount_path + "/desktop")
-
-        self.total.emit(len(rootfs_dirs)+len(rootfs_files)+len(desktop_dirs)+len(desktop_files))
-
-        percent = 0
-        for dir in rootfs_dirs:
-            os.makedirs(self.mount_path+"/root"+dir, exist_ok=True)
-            percent += 1
-            self.percent.emit(percent)
-
-        for file in rootfs_files:
-            os.system("cp -rf {} {}".format(self.mount_path+"/rootfs"+file, self.mount_path+"/root"+file))
-            percent += 1
-            self.percent.emit(percent)
-
-        for dir in desktop_dirs:
-            os.makedirs(self.mount_path + "/root" + dir, exist_ok=True)
-            percent += 1
-            self.percent.emit(percent)
-
-        for file in desktop_files:
-            os.system("cp -rf {} {}".format(self.mount_path + "/desktop" + file, self.mount_path + "/root" + file))
-            percent += 1
-            self.percent.emit(percent)
-
-        self.unpack_finish.emit()
+        subprocess.call(["unsquashfs", "-d", "-f", self.mount_path+"/root", self.desktopfs_path], stdout=subprocess.PIPE)
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
     def set_chroot(self):
         os.system("mount --bind /dev/ {}/dev/".format(self.mount_path))
@@ -227,13 +182,15 @@ class Install(QThread):
         os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path))
         os.system("mount --bind /sys/ {}/sys/".format(self.mount_path))
         os.system("mount --bind /proc/ {}/proc/".format(self.mount_path))
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
     def set_fstab(self):
 
         def fstab_parse():
             device_list = []
             blkid_output = subprocess.Popen("blkid", stdout=subprocess.PIPE)
-            output = blkid_output.stdout.read().encode("utf-8")
+            output = blkid_output.stdout.read().decode("utf-8")
 
             for o in output.split("\n"):
                 device = []
@@ -271,6 +228,9 @@ class Install(QThread):
                 elif device[1] == "swap":
                     fstab_file.write('UUID="{}"\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
 
+        self.__percent += 1
+        self.percent.emit(self.__percent)
+
     def set_locale(self):
         "LANG=tr_TR.UTF-8"
         with open(self.mount_path+"/etc/locale.conf", "w") as locale:
@@ -283,8 +243,13 @@ class Install(QThread):
         #     env.flush()
         #     env.close()
 
+        self.__percent += 1
+        self.percent.emit(self.__percent)
+
     def set_timezone(self):
         self.chroot_command("ln -s /usr/share/zoneinfo/{} /etc/localtime".format(self.timezone))
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
     def set_host(self):
         hosts_text = "# /etc/hosts\n"\
@@ -317,6 +282,9 @@ class Install(QThread):
             hosts.flush()
             hosts.close()
 
+        self.__percent += 1
+        self.percent.emit(self.__percent)
+
     def set_keyboard(self):
         if not self.keyboard_variant:
             self.keyboard_variant = ""
@@ -335,9 +303,13 @@ class Install(QThread):
             keyboard_conf.close()
 
         self.chroot_command("locale-gen")
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
     def set_initcpio(self):
         self.chroot_command("mkinitcpio -p linux")
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
     def set_sudoers(self):
         sudoers = "# to use special input methods. This may allow users to compromise  the root\n"\
@@ -361,11 +333,17 @@ class Install(QThread):
             sudoers_file.flush()
             sudoers_file.close()
 
+        self.__percent += 1
+        self.percent.emit(self.__percent)
+
     def remove_user(self):
         self.chroot_command("userdel -r {}".format(self.liveuser))
 
         if os.path.exists(self.mount_path+"/home/{}".format(self.liveuser)):
             self.chroot_command("rm -rf /home/{}".format(self.liveuser))
+
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
     def add_user(self):
         with open(self.mount_path+"/tmp/user.conf", "w") as user:
@@ -382,6 +360,9 @@ class Install(QThread):
         if self.useravatar:
             shutil.copy(os.environ["HOME"]+"/.face.icon", self.mount_path+"/root"+"/home/{}".format(self.username))
 
+        self.__percent += 1
+        self.percent.emit(self.__percent)
+
     def set_displaymanager(self):
         #lightdm
         conf_data = []
@@ -397,6 +378,9 @@ class Install(QThread):
         with open(path, "w") as conf:
             conf.write("".join(conf_data))
 
+        self.__percent += 1
+        self.percent.emit(self.__percent)
+
     def set_network(self): pass
 
     def set_grupcfg(self): pass
@@ -405,21 +389,28 @@ class Install(QThread):
         self.chroot_command("grub2-install")
         self.chroot_command("grub2-mkconfig  /boot/grub2/grub.cfg")
 
+        self.__percent += 1
+        self.percent.emit(self.__percent)
+
     def set_umount(self):
         os.system("umount {}".format(self.mount_path + "/rootfs"))
         os.system("umount {}".format(self.mount_path + "/desktop"))
         os.system("umount {}".format(self.mount_path + "/root"))
 
-        os.system("mount --force {}/dev/".format(self.mount_path))
-        os.system("mount --force {}/dev/shm".format(self.mount_path))
-        os.system("mount --force {}/dev/pts".format(self.mount_path))
-        os.system("mount --force {}/sys/".format(self.mount_path))
-        os.system("mount --force {}/proc/".format(self.mount_path))
+        os.system("umount --force {}/dev/".format(self.mount_path))
+        os.system("umount --force {}/dev/shm".format(self.mount_path))
+        os.system("umount --force {}/dev/pts".format(self.mount_path))
+        os.system("umount --force {}/sys/".format(self.mount_path))
+        os.system("umount --force {}/proc/".format(self.mount_path))
+
+        self.__percent += 1
+        self.percent.emit(self.__percent)
 
     def chroot_command(self, command):
         os.system("chroot {} /bin/sh -c \"{}\"".format(self.mount_path, command))
 
     def run(self):
+        self.total.emit(15)
         self.set_mount()
         self.set_unpack()
         self.parent.desc_label.setText(self.tr("Sistem yapılandırılıyor..."))
@@ -438,4 +429,4 @@ class Install(QThread):
         self.set_initcpio()
         self.set_umount()
         self.parent.desc_label.setText(self.tr("Sistem kuruldu."))
-        self.msleep(2000)
+        self.msleep(3000)
