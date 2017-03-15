@@ -169,11 +169,11 @@ class Install(QThread):
     def set_unpack(self):
         self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
         subprocess.call(["unsquashfs", "-f", "-d", self.mount_path+"/root", self.rootfs_path], stdout=subprocess.PIPE)
-        self.__percent += 1
+        self.__percent += 4
         self.percent.emit(self.__percent)
 
         subprocess.call(["unsquashfs", "-f", "-d", self.mount_path+"/root", self.desktopfs_path], stdout=subprocess.PIPE)
-        self.__percent += 1
+        self.__percent += 8
         self.percent.emit(self.__percent)
 
     def set_chroot(self):
@@ -389,7 +389,8 @@ class Install(QThread):
     def set_grupcfg(self): pass
 
     def install_bootloader(self):
-        self.chroot_command("grub2-install")
+        if not is_efi():
+            self.chroot_command("grub2-install {]".format(self.bootloader))
         self.chroot_command("grub2-mkconfig  /boot/grub2/grub.cfg")
 
         self.__percent += 1
@@ -413,23 +414,37 @@ class Install(QThread):
         os.system("chroot {} /bin/sh -c \"{}\"".format(self.mount_path+"/root", command))
 
     def run(self):
-        self.total.emit(15)
+        self.total.emit(25)
+        self.msleep(1000)
         self.set_mount()
+        self.msleep(1000)
         self.set_unpack()
+        self.msleep(1000)
         self.parent.desc_label.setText(self.tr("Sistem yapılandırılıyor..."))
         self.set_chroot()
+        self.msleep(1000)
         self.set_fstab()
+        self.msleep(1000)
         self.set_timezone()
+        self.msleep(1000)
         self.set_locale()
+        self.msleep(1000)
         self.set_host()
+        self.msleep(1000)
         self.set_keyboard()
+        self.msleep(1000)
         self.remove_user()
+        self.msleep(1000)
         self.add_user()
+        self.msleep(1000)
         self.set_network() #boş
         self.set_grupcfg() #boş
         self.set_displaymanager()
+        self.msleep(1000)
         self.install_bootloader()
+        self.msleep(1000)
         self.set_initcpio()
+        self.msleep(1000)
         self.set_umount()
         self.parent.desc_label.setText(self.tr("Sistem kuruldu."))
         self.msleep(3000)
