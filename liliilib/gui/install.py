@@ -168,11 +168,11 @@ class Install(QThread):
 
     def set_unpack(self):
         self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
-        subprocess.call(["unsquashfs", "-d", "-f", self.mount_path+"/root", self.rootfs_path], stdout=subprocess.PIPE)
+        subprocess.call(["unsquashfs", "-f", "-d", self.mount_path+"/root", self.rootfs_path], stdout=subprocess.PIPE)
         self.__percent += 1
         self.percent.emit(self.__percent)
 
-        subprocess.call(["unsquashfs", "-d", "-f", self.mount_path+"/root", self.desktopfs_path], stdout=subprocess.PIPE)
+        subprocess.call(["unsquashfs", "-f", "-d", self.mount_path+"/root", self.desktopfs_path], stdout=subprocess.PIPE)
         self.__percent += 1
         self.percent.emit(self.__percent)
 
@@ -211,22 +211,25 @@ class Install(QThread):
 
         with open(self.mount_path+"/root"+"/etc/fstab", "a") as fstab_file:
             for device in fstab_parse():
+                try:
+                    if self.root_disk == device[0]:
+                        fstab_file.write('UUID="{}"\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
 
-                if self.root_disk == device[0]:
-                    fstab_file.write('UUID="{}"\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
+                    elif self.home_disk == device[0]:
+                        fstab_file.write('UUID="{}"\t /home \t\t {} \t defaults\t0\t0'.format(device[1], device[2]))
 
-                elif self.home_disk == device[0]:
-                    fstab_file.write('UUID="{}"\t /home \t\t {} \t defaults\t0\t0'.format(device[1], device[2]))
+                    elif self.boot_disk == device[0]:
+                        if is_efi():
+                            fstab_file.write('UUID="{}"\t /boot/efi \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
 
-                elif self.boot_disk == device[0]:
-                    if is_efi():
-                        fstab_file.write('UUID="{}"\t /boot/efi \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
+                        else:
+                            fstab_file.write('UUID="{}"\t /boot \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
 
-                    else:
-                        fstab_file.write('UUID="{}"\t /boot \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
+                    elif device[1] == "swap":
+                        fstab_file.write('UUID="{}"\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
 
-                elif device[1] == "swap":
-                    fstab_file.write('UUID="{}"\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
+                except IndexError:
+                    print(device, "Bu ne?")
 
         self.__percent += 1
         self.percent.emit(self.__percent)
