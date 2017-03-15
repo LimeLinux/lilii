@@ -213,20 +213,20 @@ class Install(QThread):
             for device in fstab_parse():
                 try:
                     if self.root_disk == device[0]:
-                        fstab_file.write('UUID="{}"\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
+                        fstab_file.write('UUID={}\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
 
                     elif self.home_disk == device[0]:
-                        fstab_file.write('UUID="{}"\t /home \t\t {} \t defaults\t0\t0'.format(device[1], device[2]))
+                        fstab_file.write('UUID={}\t /home \t\t {} \t defaults\t0\t0'.format(device[1], device[2]))
 
                     elif self.boot_disk == device[0]:
                         if is_efi():
-                            fstab_file.write('UUID="{}"\t /boot/efi \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t /boot/efi \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
 
                         else:
-                            fstab_file.write('UUID="{}"\t /boot \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t /boot \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
 
                     elif device[1] == "swap":
-                        fstab_file.write('UUID="{}"\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
+                        fstab_file.write('UUID={}\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
 
                 except IndexError:
                     print(device, "Bu ne?")
@@ -342,7 +342,7 @@ class Install(QThread):
     def remove_user(self):
         self.chroot_command("userdel -r {}".format(self.liveuser))
 
-        if os.path.exists(self.mount_path+"/home/{}".format(self.liveuser)):
+        if os.path.exists(self.mount_path+"/root"+"/home/{}".format(self.liveuser)):
             self.chroot_command("rm -rf /home/{}".format(self.liveuser))
 
         self.__percent += 1
@@ -353,7 +353,7 @@ class Install(QThread):
             user.write("{}:{}".format(self.username, self.userpaswd))
             user.write("{}:{}".format("root", self.rootpasswd))
 
-        groups_user, groups_root = "-G sudo,audio,video,cdrom", "-G audio,video,cdrom" # ???
+        groups_user = "-G audio, video, cdrom, wheel, lpadmin"
         self.chroot_command("useradd -s {} -c '{}' {} -m {}".format("/bin/bash", self.realname, groups_user, self.username))
         self.chroot_command("cat /tmp/user.conf | chpasswd")  # kullanıcı şifresi belirtmek için.
         self.chroot_command("rm -rf /tmp/user.conf")
@@ -434,6 +434,8 @@ class Install(QThread):
         self.set_keyboard()
         self.msleep(1000)
         self.remove_user()
+        self.msleep(1000)
+        self.set_sudoers()
         self.msleep(1000)
         self.add_user()
         self.msleep(1000)
