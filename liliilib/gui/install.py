@@ -177,11 +177,11 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
     def set_chroot(self):
-        os.system("mount --bind /dev/ {}/dev/".format(self.mount_path))
-        os.system("mount --bind /dev/shm {}/dev/shm".format(self.mount_path))
-        os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path))
-        os.system("mount --bind /sys/ {}/sys/".format(self.mount_path))
-        os.system("mount --bind /proc/ {}/proc/".format(self.mount_path))
+        os.system("mount --bind /dev/ {}/dev/".format(self.mount_path+"/root"))
+        os.system("mount --bind /dev/shm {}/dev/shm".format(self.mount_path+"/root"))
+        os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path+"/root"))
+        os.system("mount --bind /sys/ {}/sys/".format(self.mount_path+"/root"))
+        os.system("mount --bind /proc/ {}/proc/".format(self.mount_path+"/root"))
         self.__percent += 1
         self.percent.emit(self.__percent)
 
@@ -390,7 +390,7 @@ class Install(QThread):
 
     def install_bootloader(self):
         if not is_efi():
-            self.chroot_command("grub2-install {]".format(self.bootloader))
+            self.chroot_command("grub2-install {}".format(self.bootloader))
         self.chroot_command("grub2-mkconfig  /boot/grub2/grub.cfg")
 
         self.__percent += 1
@@ -401,11 +401,11 @@ class Install(QThread):
         os.system("umount {}".format(self.mount_path + "/desktop"))
         os.system("umount {}".format(self.mount_path + "/root"))
 
-        os.system("umount --force {}/dev/".format(self.mount_path))
-        os.system("umount --force {}/dev/shm".format(self.mount_path))
-        os.system("umount --force {}/dev/pts".format(self.mount_path))
-        os.system("umount --force {}/sys/".format(self.mount_path))
-        os.system("umount --force {}/proc/".format(self.mount_path))
+        os.system("umount --force {}/dev/".format(self.mount_path+"/root"))
+        os.system("umount --force {}/dev/shm".format(self.mount_path+"/root"))
+        os.system("umount --force {}/dev/pts".format(self.mount_path+"/root"))
+        os.system("umount --force {}/sys/".format(self.mount_path+"/root"))
+        os.system("umount --force {}/proc/".format(self.mount_path+"/root"))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
