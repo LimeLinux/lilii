@@ -171,6 +171,13 @@ class Install(QThread):
 
     def set_unpack(self):
         self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
+        def copy(src, dst):
+            if os.path.islink(src):
+                linkto = os.readlink(src)
+                os.symlink(linkto, dst)
+            else:
+                shutil.copy(src, dst)
+
         def dirs_and_files(dir):
             dirs_list = []
             files_list = []
@@ -180,6 +187,7 @@ class Install(QThread):
                     dirs_list.append(top[len(dir):])
 
                 else:
+                    dirs_list.append(top[len(dir):])
                     for file in bottom:
                         files_list.append(os.path.join(top[len(dir):], file))
 
@@ -197,7 +205,7 @@ class Install(QThread):
             self.percent.emit(percent)
 
         for file in rootfs_files:
-            shutil.copy(self.mount_path+"/rootfs"+file, self.mount_path+"/root"+file)
+            copy(self.mount_path+"/rootfs"+file, self.mount_path+"/root"+file)
             percent += 1
             self.percent.emit(percent)
 
@@ -207,7 +215,7 @@ class Install(QThread):
             self.percent.emit(percent)
 
         for file in desktop_files:
-            shutil.copy(self.mount_path + "/desktop" + file, self.mount_path + "/root" + file)
+            copy(self.mount_path + "/desktop" + file, self.mount_path + "/root" + file)
             percent += 1
             self.percent.emit(percent)
 
