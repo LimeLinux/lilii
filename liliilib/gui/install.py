@@ -353,7 +353,7 @@ class Install(QThread):
             user.write("{}:{}".format(self.username, self.userpaswd))
             user.write("{}:{}".format("root", self.rootpasswd))
 
-        groups_user = "-G audio, video, cdrom, wheel, lpadmin"
+        groups_user = "-G audio,video,cdrom,wheel,lpadmin"
         self.chroot_command("useradd -s {} -c '{}' {} -m {}".format("/bin/bash", self.realname, groups_user, self.username))
         self.chroot_command("cat /tmp/user.conf | chpasswd")  # kullanıcı şifresi belirtmek için.
         self.chroot_command("rm -rf /tmp/user.conf")
@@ -397,15 +397,15 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
     def set_umount(self):
+        os.system("umount --force {}/dev/".format(self.mount_path + "/root"))
+        os.system("umount --force {}/dev/shm".format(self.mount_path + "/root"))
+        os.system("umount --force {}/dev/pts".format(self.mount_path + "/root"))
+        os.system("umount --force {}/sys/".format(self.mount_path + "/root"))
+        os.system("umount --force {}/proc/".format(self.mount_path + "/root"))
+
         os.system("umount {}".format(self.mount_path + "/rootfs"))
         os.system("umount {}".format(self.mount_path + "/desktop"))
         os.system("umount {}".format(self.mount_path + "/root"))
-
-        os.system("umount --force {}/dev/".format(self.mount_path+"/root"))
-        os.system("umount --force {}/dev/shm".format(self.mount_path+"/root"))
-        os.system("umount --force {}/dev/pts".format(self.mount_path+"/root"))
-        os.system("umount --force {}/sys/".format(self.mount_path+"/root"))
-        os.system("umount --force {}/proc/".format(self.mount_path+"/root"))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
