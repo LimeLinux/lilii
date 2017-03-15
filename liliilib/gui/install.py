@@ -275,12 +275,12 @@ class Install(QThread):
                      "ff02::2 ip6-allrouters\n"\
                      "ff02::3 ip6-allhosts\n".format(self.hostname)
 
-        with open(self.mount_path+"/etc/hostname", "w") as hostname:
+        with open(self.mount_path+"/root"+"/etc/hostname", "w") as hostname:
             hostname.write(self.hostname)
             hostname.flush()
             hostname.close()
 
-        with open(self.mount_path+"/etc/hosts", "w") as hosts:
+        with open(self.mount_path+"/root"+"/etc/hosts", "w") as hosts:
             hosts.write(hosts_text)
             hosts.flush()
             hosts.close()
@@ -300,7 +300,7 @@ class Install(QThread):
                    "\t\tOption \"XkbVariant\" \"{}\"\n"\
                    "EndSection\n".format(self.keyboard_model, self.keyboard_layout, self.keyboard_variant)
 
-        with open(self.mount_path+"/etc/X11/xorg.conf.d/10-keyboard.conf", "w") as keyboard_conf:
+        with open(self.mount_path+"/root"+"/etc/X11/xorg.conf.d/10-keyboard.conf", "w") as keyboard_conf:
             keyboard_conf.write(keyboard)
             keyboard_conf.flush()
             keyboard_conf.close()
@@ -331,7 +331,7 @@ class Install(QThread):
                   "#%wheel ALL=(ALL)       NOPASSWD: ALL\n"\
                   "{}    ALL=(ALL)       ALL".format(self.username)
 
-        with open(self.mount_path+"/etc/sudoers", "w") as sudoers_file:
+        with open(self.mount_path+"/root"+"/etc/sudoers", "w") as sudoers_file:
             sudoers_file.write(sudoers)
             sudoers_file.flush()
             sudoers_file.close()
@@ -369,7 +369,7 @@ class Install(QThread):
     def set_displaymanager(self):
         #lightdm
         conf_data = []
-        path = self.mount_path+"/etc/lightdm/lightdm.conf"
+        path = self.mount_path+"/root"+"/etc/lightdm/lightdm.conf"
         with open(path) as conf:
             for text in conf.readlines():
                 if text.startswith("#autologin-user="):
