@@ -205,7 +205,7 @@ class Install(QThread):
             self.percent.emit(percent)
 
         for file in rootfs_files:
-            copy(self.mount_path+"/rootfs"+file, self.mount_path+"/root"+file)
+            os.system("cp -rf {} {}".format(self.mount_path+"/rootfs"+file, self.mount_path+"/root"+file))
             percent += 1
             self.percent.emit(percent)
 
@@ -215,7 +215,7 @@ class Install(QThread):
             self.percent.emit(percent)
 
         for file in desktop_files:
-            copy(self.mount_path + "/desktop" + file, self.mount_path + "/root" + file)
+            os.system("cp -rf {} {}".format(self.mount_path + "/desktop" + file, self.mount_path + "/root" + file))
             percent += 1
             self.percent.emit(percent)
 
@@ -233,7 +233,7 @@ class Install(QThread):
         def fstab_parse():
             device_list = []
             blkid_output = subprocess.Popen("blkid", stdout=subprocess.PIPE)
-            output = blkid_output.stdout.read()
+            output = blkid_output.stdout.read().encode("utf-8")
 
             for o in output.split("\n"):
                 device = []
