@@ -349,7 +349,7 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
     def add_user(self):
-        with open(self.mount_path+"/tmp/user.conf", "w") as user:
+        with open(self.mount_path+"/root"+"/tmp/user.conf", "w") as user:
             user.write("{}:{}".format(self.username, self.userpaswd))
             user.write("{}:{}".format("root", self.rootpasswd))
 
