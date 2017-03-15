@@ -391,7 +391,7 @@ class Install(QThread):
     def install_bootloader(self):
         if not is_efi():
             self.chroot_command("grub2-install {}".format(self.bootloader))
-        self.chroot_command("grub2-mkconfig  /boot/grub2/grub.cfg")
+        self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
         self.__percent += 1
         self.percent.emit(self.__percent)
