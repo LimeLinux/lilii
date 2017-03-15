@@ -236,7 +236,7 @@ class Install(QThread):
 
     def set_locale(self):
         "LANG=tr_TR.UTF-8"
-        with open(self.mount_path+"/etc/locale.conf", "w") as locale:
+        with open(self.mount_path+"/root"+"/etc/locale.conf", "w") as locale:
             locale.write("LANG={}".format(self.locale))
             locale.flush()
             locale.close()
@@ -410,7 +410,7 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
     def chroot_command(self, command):
-        os.system("chroot {} /bin/sh -c \"{}\"".format(self.mount_path, command))
+        os.system("chroot {} /bin/sh -c \"{}\"".format(self.mount_path+"/root", command))
 
     def run(self):
         self.total.emit(15)
