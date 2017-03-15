@@ -390,7 +390,7 @@ class Install(QThread):
 
     def install_bootloader(self):
         if not is_efi():
-            self.chroot_command("grub2-install {}".format(self.bootloader))
+            self.chroot_command("grub2-install --target=i386-pc --grub-setup=/bin/true --debug {}".format(self.bootloader))
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
         self.__percent += 1
@@ -437,6 +437,8 @@ class Install(QThread):
         self.msleep(1000)
         self.set_sudoers()
         self.msleep(1000)
+        self.set_initcpio()
+        self.msleep(1000)
         self.add_user()
         self.msleep(1000)
         self.set_network() #boş
@@ -444,8 +446,6 @@ class Install(QThread):
         self.set_displaymanager()
         self.msleep(1000)
         self.install_bootloader()
-        self.msleep(1000)
-        self.set_initcpio()
         self.msleep(1000)
         self.set_umount()
         self.parent.desc_label.setText(self.tr("Sistem kuruldu."))
