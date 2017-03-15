@@ -32,8 +32,8 @@ for l in listdir('languages'):
 
 system('pyrcc5 lilii.qrc -o liliilib/resource.py')
 
-datas = [('/usr/share/applications', ['data/lilii.desktop']),
-         #('/etc/skel/.config/autostart', ['data/lilii.desktop']),
+datas = [('/usr/share/applications', ['data/lilii-installer.desktop']),
+         #('/etc/skel/.config/autostart', ['data/lilii-installer.desktop']),
          ('/usr/share/icons/hicolor/scalable/apps', ['images/lilii-logo.svg']),
          ('/usr/share/lilii/languages', langs),
          ('/usr/share/lilii/data', glob.glob("data/*.json"))

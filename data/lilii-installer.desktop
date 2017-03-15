@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Lime Linux Installer
+Name[tr]=Lime Linux Yükleyicisi
+GenericName=Lime Linux Installer
+GenericName[tr]=Lime Linux Yükleyicisi
+Exec=lilii
+Icon=lilii-logo
+Terminal=false
+Categories=Application;System;
+StartupNotify=true
+Name[tr_TR]=lilii
