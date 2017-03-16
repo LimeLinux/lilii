@@ -90,6 +90,7 @@ class InstallWidget(QWidget):
 
     def finish(self):
         self.applyPage.emit(True)
+        self.install_thread.deleteLater()
 
     def showEvent(self, event):
         self.slide_widget.startSlide()
@@ -116,7 +117,7 @@ class Install(QThread):
         self.rootfs_path = "/bootmnt/pisi/x86_64/rootfs.sqfs"
         self.desktopfs_path = "/bootmnt/pisi/x86_64/desktop.sqfs"
 
-        self.mount_path = "/mnt/lime"
+        self.mount_path = "/tmp/lime"
 
         self.hostname = self.parent.parent.lilii_settings["hostname"]
         self.locale = self.parent.parent.lilii_settings["lang"]
@@ -182,6 +183,13 @@ class Install(QThread):
         os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path+"/root"))
         os.system("mount --bind /sys/ {}/sys/".format(self.mount_path+"/root"))
         os.system("mount --bind /proc/ {}/proc/".format(self.mount_path+"/root"))
+
+        if not is_efi() and self.boot_disk:
+            self.chroot_command("mount {} /boot".format(self.boot_disk))
+
+        elif self.boot_disk:
+            self.chroot_command("mount {} /boot/efi".format(self.boot_disk))
+
         self.__percent += 1
         self.percent.emit(self.__percent)
 
@@ -390,7 +398,8 @@ class Install(QThread):
 
     def install_bootloader(self):
         if not is_efi():
-            self.chroot_command("grub2-install --target=i386-pc --grub-setup=/bin/true --debug {}".format(self.bootloader))
+            self.chroot_command("grub2-install --grub-setup=/bin/true --debug --root-directory=/boot {}"
+                                .format(self.bootloader))
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
         self.__percent += 1
@@ -418,11 +427,11 @@ class Install(QThread):
         self.msleep(1000)
         self.set_mount()
         self.msleep(1000)
+        self.set_chroot()
+        self.msleep(1000)
         self.set_unpack()
         self.msleep(1000)
         self.parent.desc_label.setText(self.tr("Sistem yapılandırılıyor..."))
-        self.set_chroot()
-        self.msleep(1000)
         self.set_fstab()
         self.msleep(1000)
         self.set_timezone()
