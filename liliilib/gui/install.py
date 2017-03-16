@@ -178,6 +178,10 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
     def set_chroot(self):
+        os.makedirs(self.mount_path+"/root/dev/shm", exist_ok=True)
+        os.makedirs(self.mount_path + "/root/dev/pts", exist_ok=True)
+        os.makedirs(self.mount_path + "/root/sys", exist_ok=True)
+        os.makedirs(self.mount_path + "/root/proc", exist_ok=True)
         os.system("mount --bind /dev/ {}/dev/".format(self.mount_path+"/root"))
         os.system("mount --bind /dev/shm {}/dev/shm".format(self.mount_path+"/root"))
         os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path+"/root"))
@@ -185,9 +189,11 @@ class Install(QThread):
         os.system("mount --bind /proc/ {}/proc/".format(self.mount_path+"/root"))
 
         if not is_efi() and self.boot_disk:
+            os.makedirs(self.mount_path + "/root/boot", exist_ok=True)
             self.chroot_command("mount {} /boot".format(self.boot_disk))
 
         elif self.boot_disk:
+            os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
             self.chroot_command("mount {} /boot/efi".format(self.boot_disk))
 
         self.__percent += 1
@@ -398,8 +404,13 @@ class Install(QThread):
 
     def install_bootloader(self):
         if not is_efi():
-            self.chroot_command("grub2-install --grub-setup=/bin/true --debug --root-directory=/boot {}"
+            if self.boot_disk:
+                self.chroot_command("grub2-install --grub-setup=/bin/true --debug --root-directory=/boot {}"
                                 .format(self.bootloader))
+            else:
+                self.chroot_command("grub2-install --grub-setup=/bin/true --debug --root-directory=/ {}"
+                                    .format(self.bootloader))
+
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
         self.__percent += 1
