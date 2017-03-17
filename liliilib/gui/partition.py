@@ -65,6 +65,12 @@ class PartitionWidget(QWidget):
         self.label2.setText("{}".format(diskType(disksList()[0])))
         hlayout.addWidget(self.label2)
 
+        self.refreshButton = QPushButton()
+        self.refreshButton.setIcon(QIcon(":/images/disk.svg"))
+        self.refreshButton.setIconSize(QSize(20, 20))
+        self.refreshButton.setToolTip(self.tr("Disk bilgilerini yenile"))
+        hlayout.addWidget(self.refreshButton)
+
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
         self.treePartitionWidget = QTreeWidget()
@@ -127,6 +133,7 @@ class PartitionWidget(QWidget):
         self.editPartitionButton.clicked.connect(self.diskConnect)
         self.combo_box.currentIndexChanged.connect(self.diskSelect)
         self.zeroPartitionButton.clicked.connect(self.diskPartitionClear)
+        self.refreshButton.clicked.connect(self.diskRefresh)
 
         self.diskPartitionList(diskInfo(disksList()[self.combo_box.currentIndex()]))
 
@@ -135,6 +142,9 @@ class PartitionWidget(QWidget):
         self.label2.setText("{}".format(diskType(disksList()[index])))
         self.selected_disk = diskInfo(disksList()[0])
         self.diskPartitionList(diskInfo(disksList()[self.combo_box.currentIndex()]))
+
+    def diskRefresh(self):
+        self.diskPartitionList(disksList()[self.combo_box.currentIndex()])
 
     def bootloaderDiskSelect(self, index):
         self.parent.lilii_settings["bootloader"] = disksList()[index].path
