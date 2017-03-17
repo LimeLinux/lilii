@@ -168,7 +168,6 @@ class Install(QThread):
 
 
     def set_unpack(self):
-        self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
         subprocess.call(["unsquashfs", "-f", "-d", self.mount_path+"/root", self.rootfs_path], stdout=subprocess.PIPE)
         self.__percent += 4
         self.percent.emit(self.__percent)
@@ -189,10 +188,12 @@ class Install(QThread):
         os.system("mount --bind /proc/ {}/proc/".format(self.mount_path+"/root"))
 
         if not is_efi() and self.boot_disk:
+            print("uefisiz boot", self.boot_disk)
             os.makedirs(self.mount_path + "/root/boot", exist_ok=True)
             self.chroot_command("mount {} /boot".format(self.boot_disk))
 
         elif self.boot_disk:
+            print("uefi", self.boot_disk)
             os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
             self.chroot_command("mount {} /boot/efi".format(self.boot_disk))
 
@@ -252,6 +253,7 @@ class Install(QThread):
         "LANG=tr_TR.UTF-8"
         with open(self.mount_path+"/root"+"/etc/locale.conf", "w") as locale:
             locale.write("LANG={}".format(self.locale))
+            locale.write("LC_COLLATE=C")
             locale.flush()
             locale.close()
 
@@ -259,6 +261,8 @@ class Install(QThread):
         #     env.write("LANG={}".format(self.locale))
         #     env.flush()
         #     env.close()
+
+        self.chroot_command("locale-gen &> /dev/null")
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -319,7 +323,6 @@ class Install(QThread):
             keyboard_conf.flush()
             keyboard_conf.close()
 
-        self.chroot_command("locale-gen")
         self.__percent += 1
         self.percent.emit(self.__percent)
 
@@ -357,7 +360,8 @@ class Install(QThread):
         self.chroot_command("userdel -r {}".format(self.liveuser))
 
         if os.path.exists(self.mount_path+"/root"+"/home/{}".format(self.liveuser)):
-            self.chroot_command("rm -rf /home/{}".format(self.liveuser))
+            os.system("rm -rf {}/home/{}".format(self.mount_path+"/root", self.liveuser))
+            print("Silindi", "{}/home/{}".format(self.mount_path+"/root", self.liveuser))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -386,8 +390,9 @@ class Install(QThread):
         path = self.mount_path+"/root"+"/etc/lightdm/lightdm.conf"
         with open(path) as conf:
             for text in conf.readlines():
-                if text.startswith("#autologin-user="):
+                if text.startswith("autologin-user="):
                     conf_data.append("autologin-user={}\n".format(self.username))
+                    print("autologin", self.username)
 
                 else:
                     conf_data.append(text)
@@ -405,7 +410,7 @@ class Install(QThread):
     def install_bootloader(self):
         if not is_efi():
             if self.boot_disk:
-                self.chroot_command("grub2-install --grub-setup=/bin/true --debug --root-directory=/boot {}"
+                self.chroot_command("grub2-install --grub-setup=/bin/true --debug --boot-directory=/boot {}"
                                 .format(self.bootloader))
             else:
                 self.chroot_command("grub2-install --grub-setup=/bin/true --debug --root-directory=/ {}"
@@ -435,6 +440,7 @@ class Install(QThread):
 
     def run(self):
         self.total.emit(25)
+        self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
         self.msleep(1000)
         self.set_mount()
         self.msleep(1000)
