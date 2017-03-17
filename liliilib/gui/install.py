@@ -417,7 +417,7 @@ class Install(QThread):
             else:
                 os.system("grub2-install --force {}".format(self.bootloader))
 
-        self.chroot_command("grub2-mkconfig -o {}/boot/grub2/grub.cfg".format(self.mount_path+"/root"))
+        self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
         self.__percent += 1
         self.percent.emit(self.__percent)
