@@ -414,13 +414,13 @@ class Install(QThread):
     def install_bootloader(self):
         if not is_efi():
             if self.boot_disk:
-                self.chroot_command("grub2-install --force --grub-setup=/bin/true --debug --boot-directory=/boot {}"
-                                .format(self.bootloader))
+                os.system("grub2-install --force --grub-setup=/bin/true --debug --boot-directory={}/boot {}"
+                                .format(self.mount_path+"/root", self.bootloader))
             else:
-                self.chroot_command("grub2-install --force --grub-setup=/bin/true --debug --root-directory=/ {}"
-                                    .format(self.bootloader))
+                os.system("grub2-install --force --grub-setup=/bin/true --debug --root-directory={}/ {}"
+                                    .format(self.mount_path+"/root", self.bootloader))
 
-        self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
+        self.chroot_command("grub2-mkconfig -o {}/boot/grub2/grub.cfg".format(self.mount_path+"/root"))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
