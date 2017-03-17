@@ -224,23 +224,27 @@ class Install(QThread):
 
             return device_list
 
-        with open(self.mount_path+"/root"+"/etc/fstab", "a") as fstab_file:
+        with open(self.mount_path+"/root"+"/etc/fstab", "w") as fstab_file:
             for device in fstab_parse():
                 try:
                     if self.root_disk == device[0]:
-                        fstab_file.write('UUID={}\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
+                        if self.home_disk:
+                            fstab_file.write('UUID={}\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
+
+                        else:
+                            fstab_file.write('UUID={}\t / \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
 
                     elif self.home_disk == device[0]:
                         fstab_file.write('UUID={}\t /home \t\t {} \t defaults\t0\t0'.format(device[1], device[2]))
 
                     elif self.boot_disk == device[0]:
                         if is_efi():
-                            fstab_file.write('UUID={}\t /boot/efi \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t /boot/efi \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
 
                         else:
-                            fstab_file.write('UUID={}\t /boot \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t /boot \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
 
-                    elif device[1] == "swap":
+                    elif device[2] == "swap":
                         fstab_file.write('UUID={}\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
 
                 except IndexError:
