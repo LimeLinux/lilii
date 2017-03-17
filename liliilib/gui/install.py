@@ -155,10 +155,10 @@ class Install(QThread):
 
 
     def set_mount(self):
-        os.makedirs(self.mount_path+"/rootfs", exist_ok=True)
-        os.makedirs(self.mount_path + "/desktop", exist_ok=True)
-        os.system("mount {} {} -t squashfs -o loop".format(self.rootfs_path, self.mount_path+"/rootfs"))
-        os.system("mount {} {} -t squashfs -o loop".format(self.desktopfs_path, self.mount_path + "/desktop"))
+        # os.makedirs(self.mount_path+"/rootfs", exist_ok=True)
+        # os.makedirs(self.mount_path + "/desktop", exist_ok=True)
+        # os.system("mount {} {} -t squashfs -o loop".format(self.rootfs_path, self.mount_path+"/rootfs"))
+        # os.system("mount {} {} -t squashfs -o loop".format(self.desktopfs_path, self.mount_path + "/desktop"))
 
         #root dizinini bağla.
         os.makedirs(self.mount_path + "/root", exist_ok=True)
@@ -181,7 +181,7 @@ class Install(QThread):
         os.makedirs(self.mount_path + "/root/dev/pts", exist_ok=True)
         os.makedirs(self.mount_path + "/root/sys", exist_ok=True)
         os.makedirs(self.mount_path + "/root/proc", exist_ok=True)
-        os.system("mount --bind /dev/ {}/dev/".format(self.mount_path+"/root"))
+        os.system("mount -o bind /dev/ {}/dev/".format(self.mount_path+"/root"))
         os.system("mount --bind /dev/shm {}/dev/shm".format(self.mount_path+"/root"))
         os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path+"/root"))
         os.system("mount --bind /sys/ {}/sys/".format(self.mount_path+"/root"))
@@ -229,23 +229,23 @@ class Install(QThread):
                 try:
                     if self.root_disk == device[0]:
                         if self.home_disk:
-                            fstab_file.write('UUID={}\t / \t\t {} \t rw,errors=remount-ro\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t / \t\t {} \t rw,errors=remount-ro\t0\t1\n'.format(device[1], device[2]))
 
                         else:
-                            fstab_file.write('UUID={}\t / \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t / \t\t {} \t defaults\t0\t1\n'.format(device[1], device[2]))
 
                     elif self.home_disk == device[0]:
-                        fstab_file.write('UUID={}\t /home \t\t {} \t defaults\t0\t0'.format(device[1], device[2]))
+                        fstab_file.write('UUID={}\t /home \t\t {} \t defaults\t0\t0\n'.format(device[1], device[2]))
 
                     elif self.boot_disk == device[0]:
                         if is_efi():
-                            fstab_file.write('UUID={}\t /boot/efi \t\t {} \t umask=0077\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t /boot/efi \t\t {} \t umask=0077\t0\t1\n'.format(device[1], device[2]))
 
                         else:
-                            fstab_file.write('UUID={}\t /boot \t\t {} \t defaults\t0\t1'.format(device[1], device[2]))
+                            fstab_file.write('UUID={}\t /boot \t\t {} \t defaults\t0\t1\n'.format(device[1], device[2]))
 
                     elif device[2] == "swap":
-                        fstab_file.write('UUID={}\t swap \t swap \t defaults\t0\t0'.format(device[1], device[2]))
+                        fstab_file.write('UUID={}\t swap \t swap \t defaults\t0\t0\n'.format(device[1], device[2]))
 
                 except IndexError:
                     print(device, "Bu ne?")
