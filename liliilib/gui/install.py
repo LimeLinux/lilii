@@ -190,12 +190,12 @@ class Install(QThread):
         if not is_efi() and self.boot_disk:
             print("uefisiz boot", self.boot_disk)
             os.makedirs(self.mount_path + "/root/boot", exist_ok=True)
-            self.chroot_command("mount {} /boot".format(self.boot_disk))
+            self.chroot_command("mount {} /boot -o loop".format(self.boot_disk))
 
         elif self.boot_disk:
             print("uefi", self.boot_disk)
             os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
-            self.chroot_command("mount {} /boot/efi".format(self.boot_disk))
+            self.chroot_command("mount {} /boot/efi -o loop".format(self.boot_disk))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -414,10 +414,10 @@ class Install(QThread):
     def install_bootloader(self):
         if not is_efi():
             if self.boot_disk:
-                self.chroot_command("grub2-install --grub-setup=/bin/true --debug --boot-directory=/boot {}"
+                self.chroot_command("grub2-install --force --grub-setup=/bin/true --debug --boot-directory=/boot {}"
                                 .format(self.bootloader))
             else:
-                self.chroot_command("grub2-install --grub-setup=/bin/true --debug --root-directory=/ {}"
+                self.chroot_command("grub2-install --force --grub-setup=/bin/true --debug --root-directory=/ {}"
                                     .format(self.bootloader))
 
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
