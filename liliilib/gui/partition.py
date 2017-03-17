@@ -167,22 +167,26 @@ class PartitionWidget(QWidget):
 
     def diskPartitionList(self, disk):
         self.treePartitionWidget.clear()
-        for partition in disk.partitions:
-            try:
-                part_item = QTreeWidgetItem()
-                part_item.setText(0, partition.path)
-                part_item.setText(1, partition.fileSystem.type)
-                part_item.setText(2, "")
-                part_item.setText(3, mbToGB(partition.getSize()))
-                self.treePartitionWidget.addTopLevelItem(part_item)
+        try:
+            for partition in disk.partitions:
+                try:
+                    part_item = QTreeWidgetItem()
+                    part_item.setText(0, partition.path)
+                    part_item.setText(1, partition.fileSystem.type)
+                    part_item.setText(2, "")
+                    part_item.setText(3, mbToGB(partition.getSize()))
+                    self.treePartitionWidget.addTopLevelItem(part_item)
 
-            except AttributeError:
-                part_item = QTreeWidgetItem()
-                part_item.setText(0, partition.path)
-                part_item.setText(1, self.tr("Bilinmiyor"))
-                part_item.setText(2, "")
-                part_item.setText(3, mbToGB(partition.getSize()))
-                self.treePartitionWidget.addTopLevelItem(part_item)
+                except AttributeError:
+                    part_item = QTreeWidgetItem()
+                    part_item.setText(0, partition.path)
+                    part_item.setText(1, self.tr("Bilinmiyor"))
+                    part_item.setText(2, "")
+                    part_item.setText(3, mbToGB(partition.getSize()))
+                    self.treePartitionWidget.addTopLevelItem(part_item)
+
+        except Exception as ex:
+            print(ex)
 
     def diskConnect(self):
         if self.treePartitionWidget.selectedItems():

@@ -162,7 +162,7 @@ class Install(QThread):
 
         #root dizinini bağla.
         os.makedirs(self.mount_path + "/root", exist_ok=True)
-        os.system("mount {} {} -o loop".format(self.root_disk, self.mount_path+"/root"))
+        os.system("mount {} {}".format(self.root_disk, self.mount_path+"/root"))
         self.__percent += 1
         self.percent.emit(self.__percent)
 
@@ -181,21 +181,24 @@ class Install(QThread):
         os.makedirs(self.mount_path + "/root/dev/pts", exist_ok=True)
         os.makedirs(self.mount_path + "/root/sys", exist_ok=True)
         os.makedirs(self.mount_path + "/root/proc", exist_ok=True)
-        os.system("mount -o bind /dev/ {}/dev/".format(self.mount_path+"/root"))
+        os.system("mount --bind /dev/ {}/dev/".format(self.mount_path+"/root"))
         os.system("mount --bind /dev/shm {}/dev/shm".format(self.mount_path+"/root"))
         os.system("mount --bind /dev/pts {}/dev/pts".format(self.mount_path+"/root"))
         os.system("mount --bind /sys/ {}/sys/".format(self.mount_path+"/root"))
         os.system("mount --bind /proc/ {}/proc/".format(self.mount_path+"/root"))
 
+        os.system("chmod 555 {}/sys/".format(self.mount_path + "/root"))
+        os.system("chmod 555 {}/proc/".format(self.mount_path + "/root"))
+
         if not is_efi() and self.boot_disk:
             print("uefisiz boot", self.boot_disk)
             os.makedirs(self.mount_path + "/root/boot", exist_ok=True)
-            self.chroot_command("mount {} /boot -o loop".format(self.boot_disk))
+            self.chroot_command("mount {} /boot".format(self.boot_disk))
 
         elif self.boot_disk:
             print("uefi", self.boot_disk)
             os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
-            self.chroot_command("mount {} /boot/efi -o loop".format(self.boot_disk))
+            self.chroot_command("mount {} /boot/efi".format(self.boot_disk))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -254,7 +257,6 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
     def set_locale(self):
-        "LANG=tr_TR.UTF-8"
         with open(self.mount_path+"/root"+"/etc/locale.conf", "w") as locale:
             locale.write("LANG={}".format(self.locale))
             locale.write("LC_COLLATE=C")
@@ -364,15 +366,14 @@ class Install(QThread):
         self.chroot_command("userdel -r {}".format(self.liveuser))
         if os.path.exists(self.mount_path+"/root"+"/home/{}".format(self.liveuser)):
             os.system("rm -rf {}/home/{}".format(self.mount_path+"/root", self.liveuser))
-            print("Silindi", "{}/home/{}".format(self.mount_path+"/root", self.liveuser))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
 
     def add_user(self):
         with open(self.mount_path+"/root"+"/tmp/user.conf", "w") as user:
-            user.write("{}:{}".format(self.username, self.userpaswd))
-            user.write("{}:{}".format("root", self.rootpasswd))
+            user.write("{}:{}\n".format(self.username, self.userpaswd))
+            user.write("{}:{}\n".format("root", self.rootpasswd))
 
         groups_user = "-G audio,video,cdrom,wheel,lpadmin"
         self.chroot_command("useradd -s {} -c '{}' {} -m {}".format("/bin/bash", self.realname, groups_user, self.username))
@@ -382,7 +383,8 @@ class Install(QThread):
         #self.chroot_command("passwd -d root") #su ile giriş yapmayı engelliyor gibi. sudo su çalışıyor.
 
         if self.useravatar:
-            shutil.copy(os.environ["HOME"]+"/.face.icon", self.mount_path+"/root"+"/home/{}".format(self.username))
+            shutil.copy(os.path.join("/home", self.liveuser, "/.face.icon"),
+                        self.mount_path+"/root"+"/home/{}".format(self.username))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -429,8 +431,8 @@ class Install(QThread):
         os.system("umount --force {}/sys/".format(self.mount_path + "/root"))
         os.system("umount --force {}/proc/".format(self.mount_path + "/root"))
 
-        os.system("umount {}".format(self.mount_path + "/rootfs"))
-        os.system("umount {}".format(self.mount_path + "/desktop"))
+        #os.system("umount {}".format(self.mount_path + "/rootfs"))
+        #os.system("umount {}".format(self.mount_path + "/desktop"))
         os.system("umount {}".format(self.mount_path + "/root"))
 
         self.__percent += 1
