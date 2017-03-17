@@ -363,6 +363,7 @@ class Install(QThread):
     def remove_user(self):
         self.chroot_command("userdel -r {}".format(self.liveuser))
         print("dizin var mı?:", os.path.exists(self.mount_path+"/root"+"/home/{}".format(self.liveuser)))
+        print(self.mount_path+"/root"+"/home/{}".format(self.liveuser))
         if os.path.exists(self.mount_path+"/root"+"/home/{}".format(self.liveuser)):
             os.system("rm -rf {}/home/{}".format(self.mount_path+"/root", self.liveuser))
             print("Silindi", "{}/home/{}".format(self.mount_path+"/root", self.liveuser))
@@ -414,13 +415,11 @@ class Install(QThread):
     def install_bootloader(self):
         if not is_efi():
             if self.boot_disk:
-                os.system("grub2-install --force --boot-directory={}/boot {}"
-                                .format(self.mount_path+"/root", self.bootloader))
+                os.system("grub2-install --force {}".format(self.bootloader))
             else:
-                os.system("grub2-install --force --root-directory={}/ {}"
-                                    .format(self.mount_path+"/root", self.bootloader))
+                os.system("grub2-install --force {}".format(self.bootloader))
 
-        self.chroot_command("grub2-mkconfig -o {}/boot/grub2/grub.cfg".format(self.mount_path+"/root"))
+            os.system("grub2-mkconfig -o {}/boot/grub2/grub.cfg".format(self.mount_path+"/root"))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
