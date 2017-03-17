@@ -143,7 +143,7 @@ class Install(QThread):
         self.is_rootpasswd = self.parent.parent.lilii_settings["root_user"]
         self.autologin = self.parent.parent.lilii_settings["auto_login"]
         self.useravatar = self.parent.parent.lilii_settings["avatar"]
-        self.liveuser = os.environ["USER"]
+        self.liveuser = "limelive"
 
         self.rootpasswd = None
 
@@ -362,8 +362,6 @@ class Install(QThread):
 
     def remove_user(self):
         self.chroot_command("userdel -r {}".format(self.liveuser))
-        print("dizin var mı?:", os.path.exists(self.mount_path+"/root"+"/home/{}".format(self.liveuser)))
-        print(self.mount_path+"/root"+"/home/{}".format(self.liveuser))
         if os.path.exists(self.mount_path+"/root"+"/home/{}".format(self.liveuser)):
             os.system("rm -rf {}/home/{}".format(self.mount_path+"/root", self.liveuser))
             print("Silindi", "{}/home/{}".format(self.mount_path+"/root", self.liveuser))
