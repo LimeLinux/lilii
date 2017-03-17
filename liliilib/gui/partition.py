@@ -144,7 +144,7 @@ class PartitionWidget(QWidget):
         self.diskPartitionList(diskInfo(disksList()[self.combo_box.currentIndex()]))
 
     def diskRefresh(self):
-        self.diskPartitionList(disksList()[self.combo_box.currentIndex()])
+        self.diskPartitionList(diskInfo(disksList()[self.combo_box.currentIndex()]))
 
     def bootloaderDiskSelect(self, index):
         self.parent.lilii_settings["bootloader"] = disksList()[index].path
