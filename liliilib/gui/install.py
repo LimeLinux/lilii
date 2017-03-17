@@ -413,9 +413,9 @@ class Install(QThread):
     def install_bootloader(self):
         if not is_efi():
             if self.boot_disk:
-                os.system("grub2-install --force {}".format(self.bootloader))
+                self.chroot_command("grub2-install --force {}".format(self.bootloader))
             else:
-                os.system("grub2-install --force {}".format(self.bootloader))
+                self.chroot_command("grub2-install --force {}".format(self.bootloader))
 
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
