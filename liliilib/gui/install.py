@@ -263,12 +263,22 @@ class Install(QThread):
             locale.flush()
             locale.close()
 
-        # with open(self.mount_path+"/etc/environment", "a") as env:
-        #     env.write("LANG={}".format(self.locale))
-        #     env.flush()
-        #     env.close()
 
-        self.chroot_command("locale-gen &> /dev/null")
+        buffer = open(self.mount_path+"/root"+"/etc/locale.gen").readlines()
+        with open(self.mount_path+"/root"+"/etc/locale.gen", "w") as locale:
+            for i in buffer:
+                if i.startswith("#{}".format(self.locale)):
+                    locale.write(self.locale)
+
+                else:
+                    locale.write(i)
+
+            locale.flush()
+            locale.close()
+
+        self.chroot_command("export LANG={}".format(self.locale))
+        self.chroot_command("export LANGUAGE={}".format(self.locale))
+        self.chroot_command("locale-gen {}".format(self.locale))
 
         self.__percent += 1
         self.percent.emit(self.__percent)

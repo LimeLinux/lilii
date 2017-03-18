@@ -66,8 +66,8 @@ class PartitionWidget(QWidget):
         hlayout.addWidget(self.label2)
 
         self.refreshButton = QPushButton()
-        self.refreshButton.setIcon(QIcon(":/images/disk.svg"))
-        self.refreshButton.setIconSize(QSize(20, 20))
+        self.refreshButton.setIcon(QIcon(":/images/refresh.svg"))
+        self.refreshButton.setIconSize(QSize(24, 24))
         self.refreshButton.setToolTip(self.tr("Disk bilgilerini yenile"))
         hlayout.addWidget(self.refreshButton)
 
