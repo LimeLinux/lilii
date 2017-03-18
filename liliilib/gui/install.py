@@ -258,8 +258,8 @@ class Install(QThread):
 
     def set_locale(self):
         with open(self.mount_path+"/root"+"/etc/locale.conf", "w") as locale:
-            locale.write("LANG={}".format(self.locale))
-            locale.write("LC_COLLATE=C")
+            locale.write("LANG={}\n".format(self.locale))
+            locale.write("LC_COLLATE=C\n")
             locale.flush()
             locale.close()
 
@@ -268,7 +268,7 @@ class Install(QThread):
         with open(self.mount_path+"/root"+"/etc/locale.gen", "w") as locale:
             for i in buffer:
                 if i.startswith("#{}".format(self.locale)):
-                    locale.write(self.locale)
+                    locale.write(self.locale+"\n")
 
                 else:
                     locale.write(i)
