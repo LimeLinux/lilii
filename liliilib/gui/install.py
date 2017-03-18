@@ -381,14 +381,15 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
     def add_user(self):
-        with open(self.mount_path+"/root"+"/tmp/user.conf", "w") as user:
-            user.write("{}:{}\n".format(self.username, self.userpaswd))
-            user.write("{}:{}\n".format("root", self.rootpasswd))
+        # with open(self.mount_path+"/root"+"/tmp/user.conf", "w") as user:
+        #     user.write("{}:{}\n".format(self.username, self.userpaswd))
+        #     user.write("{}:{}\n".format("root", self.rootpasswd))
 
         groups_user = "-G audio,video,cdrom,wheel,lpadmin"
         self.chroot_command("useradd -s {} -c '{}' {} -m {}".format("/bin/bash", self.realname, groups_user, self.username))
-        self.chroot_command("cat /tmp/user.conf | chpasswd")  # kullanıcı şifresi belirtmek için.
-        self.chroot_command("rm -rf /tmp/user.conf")
+        self.chroot_command("yes {} | passwd {}".format(self.userpaswd, self.username))  # kullanıcı şifresi belirtmek için.
+        self.chroot_command("yes {} | passwd root".format(self.rootpasswd))
+        #self.chroot_command("rm -rf /tmp/user.conf")
 
         #self.chroot_command("passwd -d root") #su ile giriş yapmayı engelliyor gibi. sudo su çalışıyor.
 
