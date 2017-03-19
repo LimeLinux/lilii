@@ -195,7 +195,7 @@ class Install(QThread):
 
         elif self.boot_disk:
             os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
-            self.chroot_command("mount {} /boot/efi".format(self.boot_disk))
+            self.chroot_command("mount -vt vfat {} /boot/efi".format(self.boot_disk))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -265,7 +265,7 @@ class Install(QThread):
         with open(self.mount_path+"/root"+"/etc/locale.gen", "w") as locale:
             for i in buffer:
                 if i.startswith("#{}".format(self.locale)):
-                    locale.write(self.locale+"\n")
+                    locale.write(self.locale + " " + self.locale.split(".")[-1] + "\n")
 
                 else:
                     locale.write(i)
@@ -429,9 +429,9 @@ class Install(QThread):
 
         else:
             self.chroot_command("grub2-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=\"{0}\""\
-                                "--recheck --debug efibootmgr --create --gpt --write-signature"\
+                                "--recheck --debug efibootmgr --create --gpt --disk {1} --write-signature"\
                                 "--loader \"/EFI/{0}/grubx64.efi\" --force"
-                                .format("LimeLinux", "Lime GNU/Linux", "1.0")) # --label "\"{2} {3} {2}\ --disk {1}
+                                .format("LimeLinux", self.boot_disk)) # --label "\"{2} {3} {2}\
 
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
