@@ -196,6 +196,7 @@ class Install(QThread):
         elif is_efi():
             os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
             self.chroot_command("mount -vt vfat {} /boot/efi".format(self.boot_disk))
+            self.chroot_command("mount -vt efivarfs efivars /sys/firmware/efi/efivars")
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -249,6 +250,9 @@ class Install(QThread):
 
                 except IndexError:
                     print(device, "Bu ne?")
+
+            if is_efi():
+                fstab_file.write("efivarfs       /sys/firmware/efi/efivars  efivarfs  defaults  0      1\n")
 
         self.__percent += 1
         self.percent.emit(self.__percent)
@@ -464,7 +468,7 @@ class Install(QThread):
 
         #os.system("umount {}".format(self.mount_path + "/rootfs"))
         #os.system("umount {}".format(self.mount_path + "/desktop"))
-        os.system("umount --force {}".format(self.mount_path + "/root"))
+        os.system("umount -lv {}".format(self.mount_path + "/root"))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
