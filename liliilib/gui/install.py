@@ -431,7 +431,7 @@ class Install(QThread):
             self.chroot_command("grub2-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=\"{0}\" "\
                                 "--recheck --debug".format("LimeLinux"))
             self.chroot_command("efibootmgr --create --gpt --disk {1} --write-signature "\
-                                "--loader \"/EFI/{0}/grubx64.efi\" --force"
+                                "--loader \"/EFI/{0}/grubx64.efi\""
                                 .format("LimeLinux", self.boot_disk)) # --label "\"{2} {3} {2}\
 
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
@@ -448,7 +448,7 @@ class Install(QThread):
 
         #os.system("umount {}".format(self.mount_path + "/rootfs"))
         #os.system("umount {}".format(self.mount_path + "/desktop"))
-        os.system("umount {}".format(self.mount_path + "/root"))
+        os.system("umount --force {}".format(self.mount_path + "/root"))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
