@@ -428,9 +428,9 @@ class Install(QThread):
                 self.chroot_command("grub2-install --force {}".format(self.bootloader))
 
         else:
-            self.chroot_command("grub2-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=\"{0}\""\
+            self.chroot_command("grub2-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=\"{0}\" "\
                                 "--recheck --debug".format("LimeLinux"))
-            self.chroot_command("efibootmgr --create --gpt --disk {1} --write-signature"\
+            self.chroot_command("efibootmgr --create --gpt --disk {1} --write-signature "\
                                 "--loader \"/EFI/{0}/grubx64.efi\" --force"
                                 .format("LimeLinux", self.boot_disk)) # --label "\"{2} {3} {2}\
 
