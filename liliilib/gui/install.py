@@ -193,7 +193,7 @@ class Install(QThread):
             os.makedirs(self.mount_path + "/root/boot", exist_ok=True)
             self.chroot_command("mount {} /boot".format(self.boot_disk))
 
-        elif self.boot_disk:
+        elif is_efi():
             os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
             self.chroot_command("mount -vt vfat {} /boot/efi".format(self.boot_disk))
 
@@ -421,6 +421,22 @@ class Install(QThread):
     def set_grupcfg(self): pass
 
     def install_bootloader(self):
+        def boot_part(dev):
+            asd = subprocess.Popen("blkid", stdout=subprocess.PIPE)
+            qwe = asd.stdout.read().decode("utf-8")
+
+            for o in qwe.split("\n"):
+                i = o.split()
+                try:
+                    if i[0][:-1] == dev:
+                        for j in i:
+                            if j.startswith("PARTUUID="):
+                                return j[10:-1]
+
+                except IndexError as ex:
+                    print(ex)
+
+
         if not is_efi():
             if self.boot_disk:
                 self.chroot_command("grub2-install --force {}".format(self.bootloader))
@@ -429,10 +445,10 @@ class Install(QThread):
 
         else:
             self.chroot_command("grub2-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=\"{0}\" "\
-                                "--recheck --debug".format("LimeLinux"))
-            self.chroot_command("efibootmgr --create --gpt --disk {1} --write-signature "\
+                                "--recheck --debug --force".format("LimeLinux"))
+            self.chroot_command("efibootmgr --create --gpt --disk {1} --part {2} --write-signature "\
                                 "--loader \"/EFI/{0}/grubx64.efi\""
-                                .format("LimeLinux", self.boot_disk)) # --label "\"{2} {3} {2}\
+                                .format("LimeLinux", self.boot_disk, boot_part(self.boot_disk))) # --label "\"{2} {3} {2}\
 
         self.chroot_command("grub2-mkconfig -o /boot/grub2/grub.cfg")
 
