@@ -20,6 +20,7 @@
 #
 
 from PyQt5.QtWidgets import QWidget, QTextBrowser, QLabel, QVBoxLayout
+from ..tools import is_efi
 
 
 class SummaryWidget(QWidget):
@@ -30,7 +31,7 @@ class SummaryWidget(QWidget):
         self.setLayout(QVBoxLayout())
 
         label1 = QLabel()
-        label1.setText(self.tr("Kurulum süreci boyunca yapılacak işlemlerin özetine genel bir bakış atın."))
+        label1.setText(self.tr("<h3>Kurulum süreci boyunca yapılacak işlemlerin özetine genel bir bakış atın.</h3>"))
         self.layout().addWidget(label1)
 
         label2 = QLabel()
@@ -71,6 +72,15 @@ class SummaryWidget(QWidget):
                                   .format(self.parent.lilii_settings["keyboard_model"][-1],
                                           self.parent.lilii_settings["keyboard_layout"][-1], variant))
 
-        self.textbrowser3.setText(self.tr("Sistem zamanı {} olarak ayarlanacaktır.\n"
-                                          "Sistem dili {} olarak ayarlanacaktır.")
-                                  .format(self.parent.lilii_settings["timezone"], self.parent.lilii_settings["lang"]))
+        self.textbrowser3.clear()
+        if self.parent.lilii_settings["/"]:
+            self.textbrowser3.append(self.tr("Kök dizin olarak {} seçildi.").format(self.parent.lilii_settings["/"]))
+
+        if self.parent.lilii_settings["/home"]:
+            self.textbrowser3.append(self.tr("Ev dizini olarak {} seçildi.").format(self.parent.lilii_settings["/home"]))
+
+        if is_efi() and self.parent.lilii_settings["/boot/efi"]:
+            self.textbrowser3.append(self.tr("Ön yükleme dizini olarak {} seçildi.").format(self.parent.lilii_settings["/boot/efi"]))
+
+        else:
+            self.textbrowser3.append(self.tr("Ön yükleyici buraya kurulacak: {}").format(self.parent.lilii_settings["bootloader"]))

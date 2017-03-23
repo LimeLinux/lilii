@@ -84,25 +84,13 @@ class KeyboardWidget(QWidget):
         if os.path.isfile("/usr/share/lilii/data/models.json"):
             self.keyboard_list = json.loads(open("/usr/share/lilii/data/models.json").read())
 
-        ## testing
-        if os.path.isfile("/home/metehan/PycharmProjects/lilii/data/models.json"):
-            self.keyboard_list = json.loads(open("/home/metehan/PycharmProjects/lilii/data/models.json").read())
-
         self.layout_list = None
         if os.path.isfile("/usr/share/lilii/data/layouts.json"):
             self.layout_list = json.loads(open("/usr/share/lilii/data/layouts.json").read())
 
-        ## testing
-        if os.path.isfile("/home/metehan/PycharmProjects/lilii/data/layouts.json"):
-            self.layout_list = json.loads(open("/home/metehan/PycharmProjects/lilii/data/layouts.json").read())
-
         self.variant_list = None
         if os.path.isfile("/usr/share/lilii/data/variants.json"):
             self.variant_list = json.loads(open("/usr/share/lilii/data/variants.json").read())
-
-        ## testing
-        if os.path.isfile("/home/metehan/PycharmProjects/lilii/data/variants.json"):
-            self.variant_list = json.loads(open("/home/metehan/PycharmProjects/lilii/data/variants.json").read())
 
         for model, value in self.keyboard_list.items():
             self.modelList.addItem(value)

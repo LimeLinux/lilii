@@ -204,6 +204,7 @@ class UserWidget(QWidget):
         self.photo_label.setFixedSize(192, 192)
         self.photo_label.setScaledContents(True)
         self.photo_label.setPixmap(QPixmap(":/images/user-avatar.svg"))
+        self.parent.lilii_settings["avatar"] = None
         right_layout.addWidget(self.photo_label)
 
         button_layout = QHBoxLayout()
@@ -310,6 +311,13 @@ class UserWidget(QWidget):
             self.passwd = False
             self.pass_icon.setPixmap(QPixmap(":/images/xxx.svg"))
 
+        if passwd == self.repass_line.text():
+            self.repasswd = True
+            self.repass_icon.setPixmap(QPixmap(":/images/apply.svg"))
+        else:
+            self.repasswd = False
+            self.repass_icon.setPixmap(QPixmap(":/images/xxx.svg"))
+
     def repasswordControl(self, repasswd):
         if repasswd == self.pass_line.text():
             self.repasswd = True
@@ -325,6 +333,13 @@ class UserWidget(QWidget):
         else:
             self.rpasswd = False
             self.rpass_icon.setPixmap(QPixmap(":/images/xxx.svg"))
+
+        if passwd == self.rrepass_line.text():
+            self.rrepasswd = True
+            self.rrepass_icon.setPixmap(QPixmap(":/images/apply.svg"))
+        else:
+            self.rrepasswd = False
+            self.rrepass_icon.setPixmap(QPixmap(":/images/xxx.svg"))
 
     def rrepasswordControl(self, repasswd):
         if repasswd == self.rpass_line.text():
@@ -373,7 +388,6 @@ class UserWidget(QWidget):
             crop_image = image.crop(imageCrop(image))
             new_image = avatarCreate(crop_image)
             new_image.save(avatar_path, "PNG")
-            self.parent.lilii_settings["avatar"] = avatar_path
             self.photo_label.setPixmap(QPixmap(avatar_path))
 
             self.parent.lilii_settings["avatar"] = True

@@ -26,6 +26,7 @@
         <file>images/disk-delete.svg</file>
         <file>images/disk-space.svg</file>
         <file>images/manuel-partition.svg</file>
+        <file>images/refresh.svg</file>
         <file>images/partitionwidget/light.svg</file>
     </qresource>
 </RCC>

@@ -21,29 +21,29 @@
 
 from setuptools import setup, find_packages
 from os import listdir, system
-
+import glob
 
 langs = []
 for l in listdir('languages'):
     if l.endswith('ts'):
-        system('lrelease-qt5 languages/%s' % l)
+        system('lrelease languages/%s' % l)
         langs.append(('languages/%s' % l).replace('.ts', '.qm'))
 
 
 system('pyrcc5 lilii.qrc -o liliilib/resource.py')
 
-datas = [('/usr/share/applications', ['data/lilii.desktop']),
-         #('/etc/skel/.config/autostart', ['data/lime-welcome.desktop']),
-         ('/usr/share/icons/hicolor/scalable/apps', ['images/lilii.svg']),
+datas = [('/usr/share/applications', ['data/lilii-installer.desktop']),
+         #('/etc/skel/.config/autostart', ['data/lilii-installer.desktop']),
+         ('/usr/share/icons/hicolor/scalable/apps', ['images/lilii-logo.svg']),
          ('/usr/share/lilii/languages', langs),
-         #('/usr/share/welcome/data', ["data/pisilinux-2-0-kurulum-belgesi.pdf", "data/lime-welcome.desktop"])
+         ('/usr/share/lilii/data', glob.glob("data/*.json"))
          ]
 
 setup(
     name = "lilii",
     scripts = ["lilii"],
     packages = find_packages(),
-    version = "1.0",
+    version = "1.0 Alpha",
     license = "GPL v3",
     description = "Lime Linux System Installer",
     author = "Metehan Özbek",

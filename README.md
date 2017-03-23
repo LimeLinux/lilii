@@ -1,7 +1,23 @@
-# lilii
-Top Secret Installer
+# Lime Linux Installer
 
-Note:
+System Installer for Lime Linux
 
-* Before pyrcc5 lilii.qrc -o liliilib/resource.py or sudo python setup.py install(test)
-* Run: sudo ./lilii or installed: sudo lilii
+Developer:
+
+Metehan Özbek - mthnzbk[at]gmail.com
+
+Testing:
+
+* Before: sudo python3 setup.py install
+* After: sudo lilii
+
+Dependency:
+
+* python3-qt5
+* python3-pillow
+* python3-parted
+
+
+Artwork:
+
+Fatih Kaya - trlinux41[at]gmail.com
