@@ -186,8 +186,7 @@ class PartitionWidget(QWidget):
                     part_item.setText(3, mbToGB(partition.getSize()))
                     self.treePartitionWidget.addTopLevelItem(part_item)
 
-        except parted.DiskLabelException as lab:
-            print(lab)
+        except (parted.DiskLabelException, AttributeError):
             part_item = QTreeWidgetItem()
             part_item.setText(0, self.tr("Disk tablosu belirsiz"))
             self.treePartitionWidget.addTopLevelItem(part_item)
