@@ -27,9 +27,17 @@ def disksList():
 
 
 def diskInfo(disk):
-    return parted.Disk(disk)
+    try:
+        return parted.Disk(disk)
+
+    except parted.DiskLabelException:
+        pass
 
 
 def diskType(disk):
-    return parted.Disk(disk).type.upper()
+    try:
+        return parted.Disk(disk).type.upper()
+
+    except parted.DiskLabelException:
+        return None
 

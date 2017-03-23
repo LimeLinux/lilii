@@ -25,6 +25,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt, QProcess, pyqtSignal
 from ..tools import *
 from .widget.diskeditwidget import DiskEditWidget
+import parted
 
 
 class PartitionWidget(QWidget):
@@ -62,7 +63,7 @@ class PartitionWidget(QWidget):
         self.label2.setStyleSheet("border: none;")
         self.label2.setIcon(QIcon(":/images/disk.svg"))
         self.label2.setIconSize(QSize(20, 20))
-        self.label2.setText("{}".format(diskType(disksList()[0])))
+        self.label2.setText("{}".format(diskType(disksList()[0]) or self.tr("Belirsiz")))
         hlayout.addWidget(self.label2)
 
         self.refreshButton = QPushButton()
@@ -185,8 +186,12 @@ class PartitionWidget(QWidget):
                     part_item.setText(3, mbToGB(partition.getSize()))
                     self.treePartitionWidget.addTopLevelItem(part_item)
 
-        except Exception as ex:
-            print(ex)
+        except parted.DiskLabelException as lab:
+            print(lab)
+            part_item = QTreeWidgetItem()
+            part_item.setText(0, self.tr("Disk tablosu belirsiz"))
+            self.treePartitionWidget.addTopLevelItem(part_item)
+
 
     def diskConnect(self):
         if self.treePartitionWidget.selectedItems():
