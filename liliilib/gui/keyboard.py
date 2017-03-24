@@ -92,14 +92,18 @@ class KeyboardWidget(QWidget):
         if os.path.isfile("/usr/share/lilii/data/variants.json"):
             self.variant_list = json.loads(open("/usr/share/lilii/data/variants.json").read())
 
-        for model, value in self.keyboard_list.items():
-            self.modelList.addItem(value)
+        model = list(self.keyboard_list.keys())
+        model.sort()
+        for i in model:
+            self.modelList.addItem(self.keyboard_list[i])
             if model == "pc105":
-                self.modelList.setCurrentText(value)
-                self.parent.lilii_settings["keyboard_model"] = model, value
+                self.modelList.setCurrentText(self.keyboard_list[i])
+                self.parent.lilii_settings["keyboard_model"] = i, self.keyboard_list[i]
 
-        for k, v in self.layout_list.items():
-            self.countryList.addItem(v)
+        keys = list(self.layout_list.keys())
+        keys.sort()
+        for i in keys:
+            self.countryList.addItem(self.layout_list[i])
 
         default = self.layout_list.get(self.parent.lilii_settings["lang"][:2], "us")
         if default == "us":
