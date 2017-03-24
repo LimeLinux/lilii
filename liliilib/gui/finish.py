@@ -48,8 +48,8 @@ class FinishWidget(QWidget):
         descText = QLabel()
         descText.setWordWrap(True)
         descText.setAlignment(Qt.AlignCenter)
-        descText.setText(self.tr("Lime Linux, sisteminize başarıyla kuruldu.\nYeni kurduğunuz sistemi kullanmak için "
-                                 "yeniden başlatabilir veya Lime Linux Çalışan sistem ile devam edebilirsiniz."))
+        descText.setText(self.tr("Lime GNU/Linux, sisteminize başarıyla kuruldu.\nYeni kurduğunuz sistemi kullanmak için "
+                                 "yeniden başlatabilir veya Lime GNU/Linux Çalışan sistem ile devam edebilirsiniz."))
         self.layout().addWidget(descText)
 
         hlayout = QHBoxLayout()

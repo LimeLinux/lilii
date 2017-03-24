@@ -41,12 +41,12 @@ class WelcomeWidget(QWidget):
 
         titleLabel = QLabel()
         titleLabel.setAlignment(Qt.AlignCenter)
-        titleLabel.setText(self.tr("<h1>Lime Linux Sistem Kurulumuna Hoşgeldiniz.</h1>"))
+        titleLabel.setText(self.tr("<h1>Lime GNU/Linux Sistem Kurulumuna Hoşgeldiniz.</h1>"))
         self.layout().addWidget(titleLabel)
 
         descLabel = QLabel()
         descLabel.setAlignment(Qt.AlignCenter)
-        descLabel.setText(self.tr("Bu program size bazı sorular soracak ve sisteminize Lime Linux kuracaktır."))
+        descLabel.setText(self.tr("Bu program size bazı sorular soracak ve sisteminize Lime GNU/Linux kuracaktır."))
         self.layout().addWidget(descLabel)
 
         lLayout = QHBoxLayout()
@@ -118,7 +118,7 @@ class WelcomeWidget(QWidget):
                 qApp.installTranslator(translator)
 
     def aboutDialog(self):
-        mbox = QMessageBox.about(self, self.tr("Lilii Yükleyici Hakkında"),
+        mbox = QMessageBox.about(self, self.tr("Lilii Hakkında"),
                                  self.tr("<h1>Lilii {}</h1>"
                                          "<b>Lime Linux için Sistem Yükleyici</b>"
                                          "<p>Copyright 2017 Metehan Özbek - <b>metehan@limelinux.com</b><br>"

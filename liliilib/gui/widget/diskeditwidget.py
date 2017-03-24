@@ -39,7 +39,7 @@ class DiskEditWidget(QDialog):
         self.layout().addLayout(hlayout)
 
         label = QLabel()
-        label.setText(self.tr("Bağlanma Noktası:"))
+        label.setText(self.tr("Bağlama Noktası:"))
         hlayout.addWidget(label)
 
         self.combobox = QComboBox()

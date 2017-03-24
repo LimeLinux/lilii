@@ -68,7 +68,7 @@ class KeyboardWidget(QWidget):
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Preferred, QSizePolicy.Expanding))
 
         keyboardLabel = QLabel()
-        keyboardLabel.setText(self.tr("Klavye:"))
+        keyboardLabel.setText(self.tr("Klavye Türü:"))
         hlayout.addWidget(keyboardLabel)
 
         self.keyboardVList = QComboBox()

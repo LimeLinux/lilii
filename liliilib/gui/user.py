@@ -69,14 +69,14 @@ class UserWidget(QWidget):
         self.layout().addLayout(left_layout)
 
         name_label = QLabel()
-        name_label.setText(self.tr("What is your name?"))
+        name_label.setText(self.tr("İsminiz nedir?"))
         left_layout.addWidget(name_label)
 
         name_layout = QHBoxLayout()
         left_layout.addLayout(name_layout)
 
         self.name_line = QLineEdit()
-        self.name_line.setPlaceholderText(self.tr("What is your name?"))
+        self.name_line.setPlaceholderText(self.tr("Fullname"))
         self.name_line.setFixedWidth(450)
         name_layout.addWidget(self.name_line)
 
@@ -86,14 +86,14 @@ class UserWidget(QWidget):
         name_layout.addWidget(self.name_icon)
 
         user_label = QLabel()
-        user_label.setText(self.tr("Kullanıcı adınız?"))
+        user_label.setText(self.tr("Giriş yapmak istediğiniz kullanıcı adınız?"))
         left_layout.addWidget(user_label)
 
         user_layout = QHBoxLayout()
         left_layout.addLayout(user_layout)
 
         self.user_line = QLineEdit()
-        self.user_line.setPlaceholderText(self.tr("Kullanıcı adınız?"))
+        self.user_line.setPlaceholderText(self.tr("Username"))
         user_layout.addWidget(self.user_line)
 
         self.user_icon = QLabel()
@@ -102,14 +102,14 @@ class UserWidget(QWidget):
         user_layout.addWidget(self.user_icon)
 
         host_label = QLabel()
-        host_label.setText(self.tr("Hostname?"))
+        host_label.setText(self.tr("Bu bilgisayarın adı ne olsun?"))
         left_layout.addWidget(host_label)
 
         host_layout = QHBoxLayout()
         left_layout.addLayout(host_layout)
 
         self.host_line = QLineEdit()
-        self.host_line.setPlaceholderText(self.tr("Hostname?"))
+        self.host_line.setPlaceholderText(self.tr("Hostname"))
         host_layout.addWidget(self.host_line)
 
         self.host_icon = QLabel()
@@ -118,7 +118,7 @@ class UserWidget(QWidget):
         host_layout.addWidget(self.host_icon)
 
         pass_label = QLabel()
-        pass_label.setText(self.tr("Kullanıcı şifreniz?"))
+        pass_label.setText(self.tr("Kullanıcı şifrenizi giriniz."))
         left_layout.addWidget(pass_label)
 
         pass_layout = QHBoxLayout()
@@ -149,12 +149,12 @@ class UserWidget(QWidget):
 
         self.auto_box = QCheckBox()
         self.auto_box.setChecked(True)
-        self.auto_box.setText(self.tr("Şifre sormadan giriş yap"))
+        self.auto_box.setText(self.tr("Şifre sormadan giriş yap."))
         left_layout.addWidget(self.auto_box)
 
         self.root_box = QCheckBox()
         self.root_box.setChecked(True)
-        self.root_box.setText(self.tr("Yönetici ile kullanıcı aynı şifreyi kullansın"))
+        self.root_box.setText(self.tr("Yönetici ile kullanıcı aynı şifreyi kullansın mı?"))
         left_layout.addWidget(self.root_box)
 
         rpass_layout = QHBoxLayout()
@@ -379,7 +379,7 @@ class UserWidget(QWidget):
 
     def selectPhoto(self):
         avatar_path = QDir.homePath() + "/.face.icon"
-        file_path = QFileDialog.getOpenFileName(self, self.tr("Avatar seçin"), QDir.homePath(), "Image (*.png *.jpg)")
+        file_path = QFileDialog.getOpenFileName(self, self.tr("Kullanıcı simgesi seçin"), QDir.homePath(), "Image (*.png *.jpg)")
 
         if file_path[0]:
             image = Image.open(file_path[0])
