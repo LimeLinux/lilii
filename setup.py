@@ -45,7 +45,7 @@ setup(
     packages = find_packages(),
     version = "1.0 Alpha",
     license = "GPL v3",
-    description = "Lime Linux System Installer",
+    description = "Lime GNU/Linux System Installer",
     author = "Metehan Özbek",
     author_email = "mthnzbk@gmail.com",
     url = "https://github.com/mthnzbk/lilii",

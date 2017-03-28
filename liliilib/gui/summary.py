@@ -39,7 +39,6 @@ class SummaryWidget(QWidget):
         self.layout().addWidget(label2)
 
         self.textbrowser1 = QTextBrowser()
-        self.textbrowser1.setText("Hebele")
         self.layout().addWidget(self.textbrowser1)
 
         label3 = QLabel()
@@ -47,7 +46,6 @@ class SummaryWidget(QWidget):
         self.layout().addWidget(label3)
 
         self.textbrowser2 = QTextBrowser()
-        self.textbrowser2.setText("Hebele")
         self.layout().addWidget(self.textbrowser2)
 
         label4 = QLabel()
@@ -55,7 +53,6 @@ class SummaryWidget(QWidget):
         self.layout().addWidget(label4)
 
         self.textbrowser3 = QTextBrowser()
-        self.textbrowser3.setText("Hebele")
         self.layout().addWidget(self.textbrowser3)
 
     def showEvent(self, event):

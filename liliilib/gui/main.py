@@ -51,22 +51,21 @@ class SingleApplication(QObject):
     def listen(self, client):
         self.mServer.removeServer(client)
         self.mServer.listen(client)
-        print("Dinleniyor... " + client)
         print(self.mServer.errorString())
 
     def hasPrevious(self, name, args):
-        print("önceki socket kontrol ediliyor...")
         socket = QLocalSocket()
         socket.connectToServer(name, QLocalSocket.ReadWrite)
         if socket.waitForConnected():
-            print("Önceki instansa argümanlar gönderiliyor.")
             if len(args) > 1:
                 socket.write(args[1])
+
             else:
                 pass
+
             socket.flush()
             return True
-        print(socket.errorString())
+
         return False
 
     def newConnection(self):
@@ -142,7 +141,7 @@ class FooterWidget(QWidget):
 
     def cancelQuestion(self):
         question = QMessageBox.question(self, self.tr("Vazgeçmek mi istiyorsun?"),
-                                        self.tr("Lime Linux Sistem Yükleyicisi'nden çıkmak istiyor musunuz?"))
+                                        self.tr("Lime GNU/Linux Sistem Yükleyicisi'nden çıkmak istiyor musunuz?"))
 
         if question == QMessageBox.Yes:
             qApp.quit()
@@ -166,10 +165,10 @@ class FooterWidget(QWidget):
 
     def nextWidget(self):
         if self.parent.currentIndex() == 5:
-            warning = QMessageBox.warning(self, self.tr("Dikkat Edin!"), self.tr("Sonraki adımda kurulum başlayacak ve "
-                                                                                  "bu adımda belirtilen işlemler sisteminize "
-                                                                                  "uygulanacaktır."),
-                                          QMessageBox.Yes|QMessageBox.No)
+            warning = QMessageBox.warning(self, self.tr("Dikkat Edin!"),
+                                          self.tr("Sonraki adımda kurulum başlayacak ve "
+                                          "bu adımda belirtilen işlemler sisteminize "
+                                          "uygulanacaktır."), QMessageBox.Yes|QMessageBox.No)
 
             if warning == QMessageBox.Yes:
                 self.parent.setCurrentIndex(self.parent.currentIndex() + 1)
@@ -193,7 +192,7 @@ class MainWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.resize(950, 580)
-        self.setWindowTitle(self.tr("Lime Linux Sistem Yükleyicisi"))
+        self.setWindowTitle(self.tr("Lime GNU/Linux Sistem Yükleyicisi"))
         self.setWindowIcon(QIcon(":/images/lilii-logo.svg"))
         self.setWindowFlags(Qt.WindowTitleHint|Qt.WindowMinimizeButtonHint) #Qt.WindowStaysOnTopHint
 
@@ -244,7 +243,6 @@ def main():
 
     single = SingleApplication()
     if single.hasPrevious("lilii", app.arguments()):
-        print("Başka oturum var")
         return False
 
     single.listen("lilii")
