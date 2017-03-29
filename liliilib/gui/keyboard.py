@@ -96,7 +96,7 @@ class KeyboardWidget(QWidget):
         model.sort()
         for i in model:
             self.modelList.addItem(self.keyboard_list[i])
-            if model == "pc105":
+            if i == "pc105":
                 self.modelList.setCurrentText(self.keyboard_list[i])
                 self.parent.lilii_settings["keyboard_model"] = i, self.keyboard_list[i]
 
