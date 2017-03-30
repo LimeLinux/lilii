@@ -191,11 +191,11 @@ class Install(QThread):
 
         if not is_efi() and self.boot_disk:
             os.makedirs(self.mount_path + "/root/boot", exist_ok=True)
-            os.system("mount {} /boot".format(self.boot_disk, self.mount_path+"/root"))
+            os.system("mount {} {}/boot".format(self.boot_disk, self.mount_path+"/root"))
 
         elif is_efi():
             os.makedirs(self.mount_path + "/root/boot/efi", exist_ok=True)
-            os.system("mount -vt vfat {} /boot/efi".format(self.boot_disk, self.mount_path+"/root"))
+            os.system("mount -vt vfat {} {}/boot/efi".format(self.boot_disk, self.mount_path+"/root"))
             os.system("mount -vt efivarfs efivars /sys/firmware/efi/efivars")
 
         self.__percent += 1
