@@ -20,18 +20,13 @@
 #
 
 from PyQt5.QtWidgets import QWidget, QProgressBar, QLabel, QVBoxLayout
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QDir
 from .widget.slidewidget import Slide, SlideWidget
 from ..tools import is_efi
 import os
 import subprocess
 import shutil
 
-
-"""
-blkid ille fstab için UUID tespit edilir. UUID=815d46ef-fdd0-4bd5-b4ac-13a4b37165d5 swap swap defaults 0 0
-
-"""
 
 class InstallWidget(QWidget):
 
@@ -395,8 +390,7 @@ class Install(QThread):
         #self.chroot_command("passwd -d root") #su ile giriş yapmayı engelliyor gibi. sudo su çalışıyor.
 
         if self.useravatar:
-            shutil.copy(os.path.join("/home", self.liveuser, "/.face.icon"),
-                        self.mount_path+"/root"+"/home/{}".format(self.username))
+            shutil.copy(QDir.homePath() + "/.face.icon", self.mount_path+"/root"+"/home/{}".format(self.username))
 
         self.__percent += 1
         self.percent.emit(self.__percent)
