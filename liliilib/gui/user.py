@@ -28,6 +28,7 @@ from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 import os
 import shutil
 from PIL import Image
+from PIL.ImageQt import ImageQt
 from ..tools import imageCrop, avatarCreate
 
 class CustomToolButton(QToolButton):
@@ -207,18 +208,41 @@ class UserWidget(QWidget):
         self.parent.lilii_settings["avatar"] = None
         right_layout.addWidget(self.photo_label)
 
+        if len(self.cameras):
+            self.photo_label.hide()
+
+            self.photo_widget = QCameraViewfinder()
+            right_layout.addWidget(self.photo_widget)
+
+            self.camera = QCamera(self.cameras[0])
+            self.camera.setViewfinder(self.photo_widget)
+            self.camera.setCaptureMode(QCamera.CaptureStillImage)
+
+            self.image_capture = QCameraImageCapture(self.camera)
+
         button_layout = QHBoxLayout()
         right_layout.addLayout(button_layout)
 
-        take_photo = CustomToolButton()
-        take_photo.setEnabled(len(self.cameras))
-        take_photo.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        take_photo.setText(self.tr("Take Photo"))
-        take_photo.setIconSize(QSize(32, 32))
-        take_photo.setIcon(QIcon(":/images/camera.svg"))
-        take_photo.setEnterIcon(QIcon(":/images/camera-red.svg"))
-        take_photo.setLeaveIcon(QIcon(":/images/camera.svg"))
-        button_layout.addWidget(take_photo)
+        self.take_photo = CustomToolButton()
+        self.take_photo.setEnabled(len(self.cameras))
+        self.take_photo.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.take_photo.setText(self.tr("Take Photo"))
+        self.take_photo.setIconSize(QSize(32, 32))
+        self.take_photo.setIcon(QIcon(":/images/camera.svg"))
+        self.take_photo.setEnterIcon(QIcon(":/images/camera-red.svg"))
+        self.take_photo.setLeaveIcon(QIcon(":/images/camera.svg"))
+        button_layout.addWidget(self.take_photo)
+
+        self.retake_photo = CustomToolButton()
+        self.retake_photo.hide()
+        self.retake_photo.setEnabled(len(self.cameras))
+        self.retake_photo.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.retake_photo.setText(self.tr("Retake Photo"))
+        self.retake_photo.setIconSize(QSize(32, 32))
+        self.retake_photo.setIcon(QIcon(":/images/camera.svg"))
+        self.retake_photo.setEnterIcon(QIcon(":/images/camera-red.svg"))
+        self.retake_photo.setLeaveIcon(QIcon(":/images/camera.svg"))
+        button_layout.addWidget(self.retake_photo)
 
         select_photo = CustomToolButton()
         select_photo.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
@@ -254,14 +278,15 @@ class UserWidget(QWidget):
         self.rrepass_line.textChanged.connect(self.lineEditsControl)
 
         select_photo.clicked.connect(self.selectPhoto)
-        take_photo.clicked.connect(self.takePhoto)
-        #self.showSignal.connect(self.lineEditsControl)
+        self.take_photo.clicked.connect(self.takePhoto)
+        self.retake_photo.clicked.connect(self.retakePhoto)
+        self.image_capture.imageSaved.connect(self.imageCapture)
 
-    #showSignal = pyqtSignal()
 
     def showEvent(self, event):
         self.lineEditsControl()
-        #self.showSignal.emit()
+        if len(self.cameras):
+            self.camera.start()
 
     def autoControl(self):
         self.parent.lilii_settings["auto_login"] = self.auto_box.isChecked()
@@ -393,4 +418,28 @@ class UserWidget(QWidget):
             self.parent.lilii_settings["avatar"] = True
 
     def takePhoto(self):
-        pass
+        self.take_photo.hide()
+        self.retake_photo.show()
+
+        self.image_capture.capture("/tmp/image.png")
+
+        self.photo_label.show()
+        self.photo_widget.hide()
+
+    def retakePhoto(self):
+        self.retake_photo.hide()
+        self.take_photo.show()
+        self.camera.start()
+
+
+        self.photo_widget.show()
+        self.photo_label.hide()
+
+    def imageCapture(self, id, image_file):
+        path = QDir.homePath() + "/.face.icon"
+        im = Image.open(image_file)
+        crop_image = im.crop(imageCrop(im))
+        new_image = avatarCreate(crop_image)
+        new_image.save(path, "PNG")
+        self.photo_label.setPixmap(QPixmap(path))
+        self.parent.lilii_settings["avatar"] = True
