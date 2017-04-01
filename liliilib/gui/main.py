@@ -191,7 +191,7 @@ class MainWindow(QWidget):
 
     def __init__(self, parent=None):
         super().__init__()
-        self.resize(950, 580)
+        self.setFixedSize(950, 580)
         self.setWindowTitle(self.tr("Lime GNU/Linux Sistem Yükleyicisi"))
         self.setWindowIcon(QIcon(":/images/lilii-logo.svg"))
         self.setWindowFlags(Qt.WindowTitleHint|Qt.WindowMinimizeButtonHint) #Qt.WindowStaysOnTopHint
