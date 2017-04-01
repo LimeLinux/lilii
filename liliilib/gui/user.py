@@ -219,6 +219,7 @@ class UserWidget(QWidget):
             self.camera.setCaptureMode(QCamera.CaptureStillImage)
 
             self.image_capture = QCameraImageCapture(self.camera)
+            self.image_capture.imageSaved.connect(self.imageCapture)
 
         button_layout = QHBoxLayout()
         right_layout.addLayout(button_layout)
@@ -280,13 +281,12 @@ class UserWidget(QWidget):
         select_photo.clicked.connect(self.selectPhoto)
         self.take_photo.clicked.connect(self.takePhoto)
         self.retake_photo.clicked.connect(self.retakePhoto)
-        self.image_capture.imageSaved.connect(self.imageCapture)
 
 
     def showEvent(self, event):
         self.lineEditsControl()
         if len(self.cameras):
-            self.camera.start()
+            self.retakePhoto()
 
     def autoControl(self):
         self.parent.lilii_settings["auto_login"] = self.auto_box.isChecked()
@@ -421,7 +421,8 @@ class UserWidget(QWidget):
         self.take_photo.hide()
         self.retake_photo.show()
 
-        self.image_capture.capture("/tmp/image.png")
+        self.image_capture.capture("/tmp/image")
+        self.camera.stop()
 
         self.photo_label.show()
         self.photo_widget.hide()
