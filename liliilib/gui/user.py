@@ -212,6 +212,7 @@ class UserWidget(QWidget):
             self.photo_label.hide()
 
             self.photo_widget = QCameraViewfinder()
+            self.photo_widget.setFixedSize(192/4*5, 192)
             right_layout.addWidget(self.photo_widget)
 
             self.camera = QCamera(self.cameras[0])
@@ -408,8 +409,6 @@ class UserWidget(QWidget):
 
         if file_path[0]:
             image = Image.open(file_path[0])
-            print(image.format, image.size, image.mode)
-
             crop_image = image.crop(imageCrop(image))
             new_image = avatarCreate(crop_image)
             new_image.save(avatar_path, "PNG")
@@ -431,7 +430,6 @@ class UserWidget(QWidget):
         self.retake_photo.hide()
         self.take_photo.show()
         self.camera.start()
-
 
         self.photo_widget.show()
         self.photo_label.hide()
