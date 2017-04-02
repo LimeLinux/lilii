@@ -31,6 +31,7 @@ import shutil
 class InstallWidget(QWidget):
 
     applyPage = pyqtSignal(bool)
+    first_show = True
 
     def __init__(self, parent=None):
         super().__init__()
@@ -88,15 +89,17 @@ class InstallWidget(QWidget):
         self.install_thread.deleteLater()
 
     def showEvent(self, event):
-        self.slide_widget.startSlide()
-        self.applyPage.emit(False)
+        if self.first_show:
+            self.slide_widget.startSlide()
+            self.applyPage.emit(False)
 
-        self.install_thread = Install(self)
-        self.install_thread.finished.connect(self.finish)
-        self.install_thread.total.connect(self.progress.setMaximum)
-        self.install_thread.percent.connect(self.progress.setValue)
+            self.install_thread = Install(self)
+            self.install_thread.finished.connect(self.finish)
+            self.install_thread.total.connect(self.progress.setMaximum)
+            self.install_thread.percent.connect(self.progress.setValue)
 
-        self.install_thread.start()
+            self.install_thread.start()
+            self.first_show = False
 
 
 class Install(QThread):
