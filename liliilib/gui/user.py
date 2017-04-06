@@ -264,6 +264,7 @@ class UserWidget(QWidget):
         self.root_box.toggled.connect(self.rootControl)
         self.host_line.textChanged.connect(self.hostnameControl)
         self.name_line.textChanged.connect(self.fullnameControl)
+        self.name_line.textChanged.connect(self.fullnameToUsername)
         self.user_line.textChanged.connect(self.usernameControl)
         self.pass_line.textChanged.connect(self.passwordControl)
         self.repass_line.textChanged.connect(self.repasswordControl)
@@ -328,6 +329,9 @@ class UserWidget(QWidget):
         else:
             self.user_name = False
             self.user_icon.setPixmap(QPixmap(":/images/xxx.svg"))
+
+    def fullnameToUsername(self, text):
+        self.user_line.setText(text.lower().replace(" ", ""))
 
     def passwordControl(self, passwd):
         if len(passwd) > 5:
