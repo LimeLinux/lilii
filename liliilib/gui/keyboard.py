@@ -30,7 +30,7 @@ class KeyboardWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.setWindowTitle(self.tr("Klavye Düzeni"))
+        self.setWindowTitle(self.tr("Keyboard Layout"))
         self.setLayout(QVBoxLayout())
         self.layout().setAlignment(Qt.AlignCenter)
 
@@ -48,7 +48,7 @@ class KeyboardWidget(QWidget):
 
         modelLabel = QLabel()
         modelLabel.setFixedWidth(150)
-        modelLabel.setText(self.tr("Klavye Modeli:"))
+        modelLabel.setText(self.tr("Keyboard Model:"))
         hlayoutx.addWidget(modelLabel)
 
         self.modelList = QComboBox()
@@ -58,7 +58,7 @@ class KeyboardWidget(QWidget):
         self.layout().addLayout(hlayout)
 
         countryLabel = QLabel()
-        countryLabel.setText(self.tr("Dil:"))
+        countryLabel.setText(self.tr("Language:"))
         hlayout.addWidget(countryLabel)
 
         self.countryList = QComboBox()
@@ -68,7 +68,7 @@ class KeyboardWidget(QWidget):
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Preferred, QSizePolicy.Expanding))
 
         keyboardLabel = QLabel()
-        keyboardLabel.setText(self.tr("Klavye Türü:"))
+        keyboardLabel.setText(self.tr("Keyboard Kind:"))
         hlayout.addWidget(keyboardLabel)
 
         self.keyboardVList = QComboBox()
@@ -76,7 +76,7 @@ class KeyboardWidget(QWidget):
         hlayout.addWidget(self.keyboardVList)
 
         self.testEdit = QLineEdit()
-        self.testEdit.setPlaceholderText(self.tr("Klavyeni test et."))
+        self.testEdit.setPlaceholderText(self.tr("Test out your keyboard."))
         #self.testEdit.setFixedWidth(800)
         self.layout().addWidget(self.testEdit)
 

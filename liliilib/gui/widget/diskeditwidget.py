@@ -39,7 +39,7 @@ class DiskEditWidget(QDialog):
         self.layout().addLayout(hlayout)
 
         label = QLabel()
-        label.setText(self.tr("Bağlama Noktası:"))
+        label.setText(self.tr("Mount Point:"))
         hlayout.addWidget(label)
 
         self.combobox = QComboBox()
@@ -49,8 +49,8 @@ class DiskEditWidget(QDialog):
         self.dialbutton.setStandardButtons(QDialogButtonBox.Ok|QDialogButtonBox.Cancel)
         self.layout().addWidget(self.dialbutton)
 
-        self.dialbutton.button(QDialogButtonBox.Ok).setText(self.tr("Tamam"))
-        self.dialbutton.button(QDialogButtonBox.Cancel).setText(self.tr("İptal"))
+        self.dialbutton.button(QDialogButtonBox.Ok).setText(self.tr("Ok"))
+        self.dialbutton.button(QDialogButtonBox.Cancel).setText(self.tr("Cancel"))
 
         self.dialbutton.accepted.connect(self.editAccept)
         self.dialbutton.rejected.connect(self.close)
@@ -63,7 +63,7 @@ class DiskEditWidget(QDialog):
         self.accept()
 
     def showEvent(self, event):
-        self.setWindowTitle(self.tr("Disk Bölümü")+" - "+self.partition.text(0))
+        self.setWindowTitle(self.tr("Disk Partition")+" - "+self.partition.text(0))
         if not self.parent.parent.lilii_settings["/"]:
             self.combobox.addItem("/")
 

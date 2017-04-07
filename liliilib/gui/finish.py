@@ -37,19 +37,19 @@ class FinishWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.setWindowTitle(self.tr("Bitir"))
+        self.setWindowTitle(self.tr("Finish"))
         self.setLayout(QVBoxLayout())
 
         titleText = QLabel()
         self.layout().addWidget(titleText)
         titleText.setAlignment(Qt.AlignCenter)
-        titleText.setText(self.tr("<h1>Tüm işlemler tamamlandı.</h1>"))
+        titleText.setText(self.tr("<h1>All of the process is completed.</h1>"))
 
         descText = QLabel()
         descText.setWordWrap(True)
         descText.setAlignment(Qt.AlignCenter)
-        descText.setText(self.tr("Lime GNU/Linux, sisteminize başarıyla kuruldu.\nYeni kurduğunuz sistemi kullanmak için "
-                                 "yeniden başlatabilir veya Lime GNU/Linux Çalışan sistem ile devam edebilirsiniz."))
+        descText.setText(self.tr("Lime GNU/Linux, has been installed successfully to your system.\nTo use the newly installed system "
+                                 "you can restart or you can continue to use Lime GNU/Linux Live system."))
         self.layout().addWidget(descText)
 
         hlayout = QHBoxLayout()

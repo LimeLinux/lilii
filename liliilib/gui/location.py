@@ -42,7 +42,7 @@ class LocationWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.setWindowTitle(self.tr("Sistem Yereli"))
+        self.setWindowTitle(self.tr("System Location"))
         self.setLayout(QVBoxLayout())
         self.layout().setAlignment(Qt.AlignCenter)
 
@@ -59,7 +59,7 @@ class LocationWidget(QWidget):
         self.layout().addLayout(hlayout)
 
         cLabel = QLabel()
-        cLabel.setText(self.tr("Bölge:"))
+        cLabel.setText(self.tr("Region:"))
         hlayout.addWidget(cLabel)
 
         self.cBox = QComboBox()
@@ -69,7 +69,7 @@ class LocationWidget(QWidget):
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Preferred, QSizePolicy.Expanding))
 
         iLabel = QLabel()
-        iLabel.setText(self.tr("Şehir:"))
+        iLabel.setText(self.tr("City:"))
         hlayout.addWidget(iLabel)
 
         self.iBox = QComboBox()

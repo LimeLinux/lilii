@@ -21,7 +21,7 @@
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QColor, QPixmap
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtCore import Qt, QRectF, QRect
 import random
 from ...tools import mbToGB
 
@@ -48,7 +48,7 @@ class LPartitionWidget(QWidget):
         self.repaint()
 
     def __percentage(self, width, capacity, max_capacity):
-        return int(width * (capacity/max_capacity))
+        return width * (capacity/max_capacity)
 
     def removePartition(self, partition):
         self.partitions.remove(partition)
@@ -62,37 +62,56 @@ class LPartitionWidget(QWidget):
         height = 36
 
         previous = 0
+        percent_up = 0
         for partition in self.partitions:
             color = self.color_list[self.partitions.index(partition)]
-            percent = self.__percentage(width, int(partition.getSize()), self.max_capacity)
+            percent = self.__percentage(width, partition.getSize(), self.max_capacity)
+
+            if percent < 3:
+                percent += 4
+                percent_up += 1
+
+            if percent_up >= 0 and percent >= width/35:
+                percent -= 4 * percent_up
+                percent_up = 0
             print(percent, width)
             painter.setPen(color)
             painter.setBrush(color)
-            painter.drawRect(QRect(5+previous, 5, percent, 34))
+            painter.drawRect(QRectF(4+previous, 5, percent, 34))
             previous += percent
 
 
         #Çerçeve
         painter.setPen(QColor(Qt.black))
         painter.setBrush(Qt.NoBrush)
-        painter.drawRoundedRect(QRect(4, 4, width, height), 4, 4)
+        painter.drawRoundedRect(QRectF(4, 4, width, height), 4, 4)
         #Parlaklık
         painter.drawPixmap(QRect(6, 6, width-4, height-4), QPixmap(":/images/partitionwidget/light.svg"))
 
         #kareler
+        column = 0
+        counter = 0
         for partition in self.partitions:
-            counter = self.partitions.index(partition)
             painter.setPen(Qt.black)
-            painter.setBrush(self.color_list[counter])
-            painter.drawRoundedRect(QRect(4+(counter*150), 50, 12, 12), 2, 2)
-            painter.drawText(QRect(24+(counter*150), 50, 30, 12),
-                             Qt.AlignVCenter|Qt.TextDontClip, partition.path)
+            painter.setBrush(self.color_list[self.partitions.index(partition)])
+
+            if width - (counter * 150) <= 150:
+                column += 1
+                counter = 0
+
+            painter.drawRoundedRect(QRectF(4 + (counter * 150), (column*32)+64, 12, 12), 2, 2)
+            painter.drawText(QRectF(24 + (counter * 150), (column*32)+64, 30, 12),
+                             Qt.AlignVCenter | Qt.TextDontClip, partition.path)
             painter.setPen(Qt.darkGray)
+
             if partition.fileSystem:
-                painter.drawText(QRect(24+(counter*150), 64, 40, 12),
-                                 Qt.AlignVCenter|Qt.TextDontClip, "{}  {}".format(mbToGB(partition.getSize()),
-                                                                                 partition.fileSystem.type))
+                painter.drawText(QRectF(24 + (counter * 150), (column*32)+78, 40, 12),
+                                 Qt.AlignVCenter | Qt.TextDontClip, "{}  {}".format(mbToGB(partition.getSize()),
+                                                                                    partition.fileSystem.type))
 
             else:
-                painter.drawText(QRect(24 + (counter * 150), 64, 40, 12),
-                                 Qt.AlignVCenter | Qt.TextDontClip, self.tr("{}  Bilinmiyor").format(mbToGB(partition.getSize())))
+                painter.drawText(QRectF(24 + (counter * 150), (column*32)+78, 40, 12),
+                                 Qt.AlignVCenter | Qt.TextDontClip,
+                                 self.tr("{}  Bilinmiyor").format(mbToGB(partition.getSize())))
+
+            counter += 1

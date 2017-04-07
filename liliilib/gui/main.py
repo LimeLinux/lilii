@@ -111,24 +111,24 @@ class FooterWidget(QWidget):
 
         self.cancelButton = QPushButton()
         self.cancelButton.setIcon(QIcon(":/images/cancel.svg"))
-        self.cancelButton.setText(self.tr("Vazgeç"))
+        self.cancelButton.setText(self.tr("Cancel"))
         self.layout().addWidget(self.cancelButton)
 
         self.layout().addItem(QSpacerItem(40, 20, QSizePolicy.Maximum, QSizePolicy.Maximum))
 
         self.backButton = QPushButton()
         self.backButton.setIcon(QIcon(":/images/back.svg"))
-        self.backButton.setText(self.tr("Geri"))
+        self.backButton.setText(self.tr("Back"))
         self.layout().addWidget(self.backButton)
 
         self.continueButton = QPushButton()
         self.continueButton.setIcon(QIcon(":/images/forward.svg"))
-        self.continueButton.setText(self.tr("Devam"))
+        self.continueButton.setText(self.tr("Continue"))
         self.layout().addWidget(self.continueButton)
 
         self.applyButton = QPushButton()
         self.applyButton.setIcon(QIcon(":/images/apply.svg"))
-        self.applyButton.setText(self.tr("Bitti"))
+        self.applyButton.setText(self.tr("Finish"))
         self.layout().addWidget(self.continueButton)
 
         self.parent.currentChanged.connect(self.buttonStatus)
@@ -140,8 +140,8 @@ class FooterWidget(QWidget):
             self.backButton.setDisabled(True)
 
     def cancelQuestion(self):
-        question = QMessageBox.question(self, self.tr("Vazgeçmek mi istiyorsun?"),
-                                        self.tr("Lime GNU/Linux Sistem Yükleyicisi'nden çıkmak istiyor musunuz?"))
+        question = QMessageBox.question(self, self.tr("Do you want to quit?"),
+                                        self.tr("Do you want to quit from Lime GNU/Linux System Installer?"))
 
         if question == QMessageBox.Yes:
             qApp.quit()
@@ -153,7 +153,7 @@ class FooterWidget(QWidget):
             self.backButton.setDisabled(True)
 
         if current+1 == self.parent.count():
-            self.continueButton.setText(self.tr("Çıkış"))
+            self.continueButton.setText(self.tr("Exit"))
             self.continueButton.setIcon(QIcon(":/images/exit.svg"))
             self.continueButton.clicked.connect(qApp.quit)
             self.backButton.setDisabled(True)
@@ -165,10 +165,10 @@ class FooterWidget(QWidget):
 
     def nextWidget(self):
         if self.parent.currentIndex() == 5:
-            warning = QMessageBox.warning(self, self.tr("Dikkat Edin!"),
-                                          self.tr("Sonraki adımda kurulum başlayacak ve "
-                                          "bu adımda belirtilen işlemler sisteminize "
-                                          "uygulanacaktır."), QMessageBox.Yes|QMessageBox.No)
+            warning = QMessageBox.warning(self, self.tr("Be Carefull!"),
+                                          self.tr("Setup is going to start in the next step and "
+                                          "stated steps are going to be applied to your system."),
+                                          QMessageBox.Yes|QMessageBox.No)
 
             if warning == QMessageBox.Yes:
                 self.parent.setCurrentIndex(self.parent.currentIndex() + 1)
@@ -192,7 +192,7 @@ class MainWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.setFixedSize(950, 580)
-        self.setWindowTitle(self.tr("Lime GNU/Linux Sistem Yükleyicisi"))
+        self.setWindowTitle(self.tr("Lime GNU/Linux System Installer"))
         self.setWindowIcon(QIcon(":/images/lilii-logo.svg"))
         self.setWindowFlags(Qt.WindowTitleHint|Qt.WindowMinimizeButtonHint) #Qt.WindowStaysOnTopHint
 
@@ -235,7 +235,7 @@ class MainWindow(QWidget):
 def main():
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
-    app.setApplicationVersion("1.0 Alpha")
+    app.setApplicationVersion("1.0 Beta")
     locale = QLocale.system().name()
     translator = QTranslator(app)
     translator.load("/usr/share/lilii/languages/{}.qm".format(locale))

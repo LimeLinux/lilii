@@ -29,24 +29,24 @@ class WelcomeWidget(QWidget):
     lang_list = {"ca_ES.UTF-8" : "Català", "de_DE.UTF-8" : "Deutsch", "en_US.UTF-8" : "English (US)", "es_ES.UTF-8" : "Español",
                  "fr_FR.UTF-8" : "Français", "hu.UTF-8" : "Magyar", "it_IT.UTF-8" : "Italiano", "nl_NL.UTF-8" : "Nederlands",
                  "pl.UTF-8" : "Polski", "pt_BR.UTF-8" : "Português (Brasil)", "ru_RU.UTF-8" : "Pусский",
-                 "sw_SE.UTF-8" : "Svenska", "tr_TR.UTF-8" : "Türkçe"}
+                 "sv_SE.UTF-8" : "Svenska", "tr_TR.UTF-8" : "Türkçe"}
 
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.setWindowTitle(self.tr("Hoşgeldiniz"))
+        self.setWindowTitle(self.tr("Welcome"))
 
         self.setLayout(QVBoxLayout())
         self.layout().setAlignment(Qt.AlignCenter)
 
         titleLabel = QLabel()
         titleLabel.setAlignment(Qt.AlignCenter)
-        titleLabel.setText(self.tr("<h1>Lime GNU/Linux Sistem Kurulumuna Hoşgeldiniz.</h1>"))
+        titleLabel.setText(self.tr("<h1>Welcome to Lime GNU/Linux System Installer.</h1>"))
         self.layout().addWidget(titleLabel)
 
         descLabel = QLabel()
         descLabel.setAlignment(Qt.AlignCenter)
-        descLabel.setText(self.tr("Bu program size bazı sorular soracak ve sisteminize Lime GNU/Linux kuracaktır."))
+        descLabel.setText(self.tr("This program is going to ask you some questions and then will install the Lime GNU/Linux to your device."))
         self.layout().addWidget(descLabel)
 
         lLayout = QHBoxLayout()
@@ -64,7 +64,7 @@ class WelcomeWidget(QWidget):
         self.layout().addLayout(langLayout)
 
         langLabel = QLabel()
-        langLabel.setText(self.tr("Dil:"))
+        langLabel.setText(self.tr("Language:"))
         langLayout.addWidget(langLabel)
 
         langComboBox = QComboBox()
@@ -77,21 +77,21 @@ class WelcomeWidget(QWidget):
 
         aboutButton = QPushButton()
         aboutButton.setFlat(True)
-        aboutButton.setText(self.tr("Hakkında"))
+        aboutButton.setText(self.tr("About"))
         aboutButton.setIcon(QIcon(":/images/about.svg"))
         aboutButton.setIconSize(QSize(18, 18))
         linkLayout.addWidget(aboutButton)
 
         bugButton = QPushButton()
         bugButton.setFlat(True)
-        bugButton.setText(self.tr("Bilinen Hatalar"))
+        bugButton.setText(self.tr("Found Bugs"))
         bugButton.setIcon(QIcon(":/images/bug.svg"))
         bugButton.setIconSize(QSize(18, 18))
         linkLayout.addWidget(bugButton)
 
         releaseButton = QPushButton()
         releaseButton.setFlat(True)
-        releaseButton.setText(self.tr("Sürüm Notları"))
+        releaseButton.setText(self.tr("Release Notes"))
         releaseButton.setIcon(QIcon(":/images/release-note.svg"))
         releaseButton.setIconSize(QSize(18, 18))
         linkLayout.addWidget(releaseButton)
@@ -118,11 +118,11 @@ class WelcomeWidget(QWidget):
                 qApp.installTranslator(translator)
 
     def aboutDialog(self):
-        mbox = QMessageBox.about(self, self.tr("Lilii Hakkında"),
+        mbox = QMessageBox.about(self, self.tr("About Lilii"),
                                  self.tr("<h1>Lilii {}</h1>"
-                                         "<b>Lime Linux için Sistem Yükleyici</b>"
+                                         "<b>System installer for Lime GNU/Linux</b>"
                                          "<p>Copyright 2017 Metehan Özbek - <b>metehan@limelinux.com</b><br>"
-                                         "Teşekkürler: Fatih Kaya - <b>trlinux41@gmail.com</b></p>".format(qApp.applicationVersion())))
+                                         "Thanks to: Fatih Kaya - <b>trlinux41@gmail.com</b></p>".format(qApp.applicationVersion())))
 
     def bugAdressConnect(self):
         QDesktopServices.openUrl(QUrl("https://github.com/mthnzbk/lilii/issues"))

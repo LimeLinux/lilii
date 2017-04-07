@@ -62,7 +62,7 @@ class UserWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.setWindowTitle(self.tr("Kullanıcı Oluşturma"))
+        self.setWindowTitle(self.tr("User Creation"))
         self.setStyleSheet("QToolButton {border: none;}")
         self.setLayout(QHBoxLayout())
 
@@ -70,7 +70,7 @@ class UserWidget(QWidget):
         self.layout().addLayout(left_layout)
 
         name_label = QLabel()
-        name_label.setText(self.tr("İsminiz nedir?"))
+        name_label.setText(self.tr("What is your name?"))
         left_layout.addWidget(name_label)
 
         name_layout = QHBoxLayout()
@@ -87,7 +87,7 @@ class UserWidget(QWidget):
         name_layout.addWidget(self.name_icon)
 
         user_label = QLabel()
-        user_label.setText(self.tr("Giriş yapmak istediğiniz kullanıcı adınız?"))
+        user_label.setText(self.tr("Username to sign in?"))
         left_layout.addWidget(user_label)
 
         user_layout = QHBoxLayout()
@@ -103,7 +103,7 @@ class UserWidget(QWidget):
         user_layout.addWidget(self.user_icon)
 
         host_label = QLabel()
-        host_label.setText(self.tr("Bu bilgisayarın adı ne olsun?"))
+        host_label.setText(self.tr("What should this computer be named?"))
         left_layout.addWidget(host_label)
 
         host_layout = QHBoxLayout()
@@ -119,7 +119,7 @@ class UserWidget(QWidget):
         host_layout.addWidget(self.host_icon)
 
         pass_label = QLabel()
-        pass_label.setText(self.tr("Kullanıcı şifrenizi giriniz."))
+        pass_label.setText(self.tr("Enter your user password."))
         left_layout.addWidget(pass_label)
 
         pass_layout = QHBoxLayout()
@@ -150,12 +150,12 @@ class UserWidget(QWidget):
 
         self.auto_box = QCheckBox()
         self.auto_box.setChecked(True)
-        self.auto_box.setText(self.tr("Şifre sormadan giriş yap."))
+        self.auto_box.setText(self.tr("Sign in without password."))
         left_layout.addWidget(self.auto_box)
 
         self.root_box = QCheckBox()
         self.root_box.setChecked(True)
-        self.root_box.setText(self.tr("Yönetici ile kullanıcı aynı şifreyi kullansın mı?"))
+        self.root_box.setText(self.tr("Should the administrator and the user use the same password?"))
         left_layout.addWidget(self.root_box)
 
         rpass_layout = QHBoxLayout()
@@ -409,7 +409,7 @@ class UserWidget(QWidget):
 
     def selectPhoto(self):
         avatar_path = QDir.homePath() + "/.face.icon"
-        file_path = QFileDialog.getOpenFileName(self, self.tr("Kullanıcı simgesi seçin"), QDir.homePath(), "Image (*.png *.jpg)")
+        file_path = QFileDialog.getOpenFileName(self, self.tr("Choose a user icon"), QDir.homePath(), "Image (*.png *.jpg)")
 
         if file_path[0]:
             image = Image.open(file_path[0])

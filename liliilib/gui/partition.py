@@ -37,7 +37,7 @@ class PartitionWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.setWindowTitle(self.tr("Disk Bölümleme"))
+        self.setWindowTitle(self.tr("Disk Partition"))
         self.setLayout(QVBoxLayout())
 
         self.parent.lilii_settings["/"] = None
@@ -49,7 +49,7 @@ class PartitionWidget(QWidget):
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
         label1 = QLabel()
-        label1.setText(self.tr("Lime Linux kurulacak diski seçin: "))
+        label1.setText(self.tr("Select where the Lime GNU/Linux is going to be installed: "))
         hlayout.addWidget(label1)
 
         self.combo_box = QComboBox()
@@ -63,13 +63,13 @@ class PartitionWidget(QWidget):
         self.label2.setStyleSheet("border: none;")
         self.label2.setIcon(QIcon(":/images/disk.svg"))
         self.label2.setIconSize(QSize(20, 20))
-        self.label2.setText("{}".format(diskType(disksList()[0]) or self.tr("Belirsiz")))
+        self.label2.setText("{}".format(diskType(disksList()[0]) or self.tr("Unknown")))
         hlayout.addWidget(self.label2)
 
         self.refreshButton = QPushButton()
         self.refreshButton.setIcon(QIcon(":/images/refresh.svg"))
         self.refreshButton.setIconSize(QSize(24, 24))
-        self.refreshButton.setToolTip(self.tr("Disk bilgilerini yenile"))
+        self.refreshButton.setToolTip(self.tr("Refresh disk information"))
         hlayout.addWidget(self.refreshButton)
 
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
@@ -78,10 +78,10 @@ class PartitionWidget(QWidget):
         self.layout().addWidget(self.treePartitionWidget)
 
         header = self.treePartitionWidget.headerItem()
-        header.setText(0, self.tr("Disk Bölümü"))
-        header.setText(1, self.tr("Dosya Sistemi"))
-        header.setText(2, self.tr("Bağlama Noktası"))
-        header.setText(3, self.tr("Boyut"))
+        header.setText(0, self.tr("Disk Part"))
+        header.setText(1, self.tr("File System"))
+        header.setText(2, self.tr("Mount Point"))
+        header.setText(3, self.tr("Size"))
 
         self.treePartitionWidget.setColumnWidth(0, 450)
         self.treePartitionWidget.setColumnWidth(1, 150)
@@ -95,11 +95,11 @@ class PartitionWidget(QWidget):
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
         self.editPartitionButton = QPushButton()
-        self.editPartitionButton.setText(self.tr("Düzenle"))
+        self.editPartitionButton.setText(self.tr("Edit"))
         hlayout.addWidget(self.editPartitionButton)
 
         self.zeroPartitionButton = QPushButton()
-        self.zeroPartitionButton.setText(self.tr("Sıfırla"))
+        self.zeroPartitionButton.setText(self.tr("Reset"))
         hlayout.addWidget(self.zeroPartitionButton)
 
 
@@ -111,7 +111,7 @@ class PartitionWidget(QWidget):
             hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Maximum))
 
             bootLabel = QLabel()
-            bootLabel.setText(self.tr("Ön yükleyiciyi şuraya kur:"))
+            bootLabel.setText(self.tr("Where to install the bootloader:"))
             hlayout.addWidget(bootLabel)
 
             self.combo_box2 = QComboBox()
@@ -181,14 +181,14 @@ class PartitionWidget(QWidget):
                 except AttributeError:
                     part_item = QTreeWidgetItem()
                     part_item.setText(0, partition.path)
-                    part_item.setText(1, self.tr("Bilinmiyor"))
+                    part_item.setText(1, self.tr("Unknown"))
                     part_item.setText(2, "")
                     part_item.setText(3, mbToGB(partition.getSize()))
                     self.treePartitionWidget.addTopLevelItem(part_item)
 
         except (parted.DiskLabelException, AttributeError):
             part_item = QTreeWidgetItem()
-            part_item.setText(0, self.tr("Disk tablosu belirsiz"))
+            part_item.setText(0, self.tr("Partition table not Found"))
             self.treePartitionWidget.addTopLevelItem(part_item)
 
 

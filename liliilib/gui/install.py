@@ -36,7 +36,7 @@ class InstallWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        self.setWindowTitle(self.tr("Sistem Yüklemesi"))
+        self.setWindowTitle(self.tr("System Installation"))
         self.setLayout(QVBoxLayout())
 
         self.slide_widget = SlideWidget()
@@ -475,7 +475,7 @@ class Install(QThread):
 
     def run(self):
         self.total.emit(25)
-        self.parent.desc_label.setText(self.tr("Dosyalar yükleniyor..."))
+        self.parent.desc_label.setText(self.tr("Files loading..."))
         self.msleep(1000)
         self.set_mount()
         self.msleep(1000)
@@ -483,7 +483,7 @@ class Install(QThread):
         self.msleep(1000)
         self.set_unpack()
         self.msleep(1000)
-        self.parent.desc_label.setText(self.tr("Sistem yapılandırılıyor..."))
+        self.parent.desc_label.setText(self.tr("System configuration..."))
         self.set_fstab()
         self.msleep(1000)
         self.set_timezone()
@@ -509,5 +509,5 @@ class Install(QThread):
         self.install_bootloader()
         self.msleep(1000)
         self.set_umount()
-        self.parent.desc_label.setText(self.tr("Sistem kuruldu."))
+        self.parent.desc_label.setText(self.tr("System installed."))
         self.msleep(3000)
