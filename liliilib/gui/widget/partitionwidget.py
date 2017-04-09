@@ -67,7 +67,7 @@ class LPartitionWidget(QWidget):
             color = self.color_list[self.partitions.index(partition)]
             percent = self.__percentage(width, partition.getSize(), self.max_capacity)
 
-            if percent < 3:
+            if percent < 10:
                 percent += 4
                 percent_up += 1
 
@@ -89,29 +89,29 @@ class LPartitionWidget(QWidget):
         painter.drawPixmap(QRect(6, 6, width-4, height-4), QPixmap(":/images/partitionwidget/light.svg"))
 
         #kareler
+        line = 0
         column = 0
-        counter = 0
         for partition in self.partitions:
             painter.setPen(Qt.black)
             painter.setBrush(self.color_list[self.partitions.index(partition)])
 
-            if width - (counter * 150) <= 150:
+            if width - (line * 150) <= 150:
                 column += 1
-                counter = 0
+                line = 0
 
-            painter.drawRoundedRect(QRectF(4 + (counter * 150), (column*32)+64, 12, 12), 2, 2)
-            painter.drawText(QRectF(24 + (counter * 150), (column*32)+64, 30, 12),
+            painter.drawRoundedRect(QRectF(4 + (line * 150), (column*32)+64, 12, 12), 2, 2)
+            painter.drawText(QRectF(24 + (line * 150), (column*32)+64, 30, 12),
                              Qt.AlignVCenter | Qt.TextDontClip, partition.path)
             painter.setPen(Qt.darkGray)
 
             if partition.fileSystem:
-                painter.drawText(QRectF(24 + (counter * 150), (column*32)+78, 40, 12),
+                painter.drawText(QRectF(24 + (line * 150), (column*32)+78, 40, 12),
                                  Qt.AlignVCenter | Qt.TextDontClip, "{}  {}".format(mbToGB(partition.getSize()),
                                                                                     partition.fileSystem.type))
 
             else:
-                painter.drawText(QRectF(24 + (counter * 150), (column*32)+78, 40, 12),
+                painter.drawText(QRectF(24 + (line * 150), (column*32)+78, 40, 12),
                                  Qt.AlignVCenter | Qt.TextDontClip,
                                  self.tr("{}  Bilinmiyor").format(mbToGB(partition.getSize())))
 
-            counter += 1
+            line += 1
