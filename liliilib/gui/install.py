@@ -262,6 +262,11 @@ class Install(QThread):
             locale.flush()
             locale.close()
 
+        os.makedirs(self.mount_path + "/root/etc/mudur", exist_ok=True)
+        with open(self.mount_path+"/root/etc/mudur/locale", "w") as locale:
+            locale.write("{}\n".format(self.locale))
+            locale.flush()
+            locale.close()
 
         buffer = open(self.mount_path+"/root"+"/etc/locale.gen").readlines()
         with open(self.mount_path+"/root"+"/etc/locale.gen", "w") as locale:
@@ -416,6 +421,10 @@ class Install(QThread):
 
         self.__percent += 1
         self.percent.emit(self.__percent)
+
+        #XOrg
+        self.chroot_command("xorg :1 configure")
+        self.chroot_command("cp /root/xorg.conf.new /etc/X11/xorg.conf")
 
     def set_network(self): pass
 
