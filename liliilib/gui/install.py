@@ -152,6 +152,16 @@ class Install(QThread):
             self.rootpasswd = self.parent.parent.lilii_settings["root_pass"]
 
 
+    def set_preumount(self):
+        command = subprocess.Popen(["df", "-h"], stdout=subprocess.Popen)
+        output = command.stdout.read().decode("utf-8")
+
+        for out in output.split("\n"):
+            if out.startswith("/dev/sd"):
+                mount_folder = out.split()[-1]
+                os.system("umount --force {}".format(mount_folder))
+
+
     def set_mount(self):
         # os.makedirs(self.mount_path+"/rootfs", exist_ok=True)
         # os.makedirs(self.mount_path + "/desktop", exist_ok=True)
@@ -484,6 +494,7 @@ class Install(QThread):
 
     def run(self):
         self.total.emit(25)
+        self.set_preumount()
         self.parent.desc_label.setText(self.tr("Files loading..."))
         self.msleep(1000)
         self.set_mount()
