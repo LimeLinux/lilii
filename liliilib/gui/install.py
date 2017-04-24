@@ -433,8 +433,8 @@ class Install(QThread):
         self.percent.emit(self.__percent)
 
         #XOrg
-        self.chroot_command("Xorg :1 -configure")
-        self.chroot_command("cp /root/xorg.conf.new /etc/X11/xorg.conf")
+        #self.chroot_command("Xorg :1 -configure")
+        #self.chroot_command("cp /root/xorg.conf.new /etc/X11/xorg.conf")
 
     def set_network(self): pass
 
