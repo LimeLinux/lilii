@@ -159,7 +159,8 @@ class Install(QThread):
         for out in output.split("\n"):
             if out.startswith("/dev/sd"):
                 mount_folder = out.split()[-1]
-                os.system("umount --force {}".format(mount_folder))
+                if not mount_folder == "/bootmnt":
+                    os.system("umount --force {}".format(mount_folder))
 
 
     def set_mount(self):
