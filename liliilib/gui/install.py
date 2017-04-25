@@ -153,7 +153,7 @@ class Install(QThread):
 
 
     def set_preumount(self):
-        command = subprocess.Popen(["df", "-h"], stdout=subprocess.Popen)
+        command = subprocess.Popen(["df", "-h"], stdout=subprocess.PIPE)
         output = command.stdout.read().decode("utf-8")
 
         for out in output.split("\n"):
