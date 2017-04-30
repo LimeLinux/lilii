@@ -62,7 +62,7 @@ class KeyboardWidget(QWidget):
         hlayout.addWidget(countryLabel)
 
         self.countryList = QComboBox()
-        self.countryList.setFixedWidth(400)
+        self.countryList.setFixedWidth(325)
         hlayout.addWidget(self.countryList)
 
         hlayout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Preferred, QSizePolicy.Expanding))
@@ -72,7 +72,7 @@ class KeyboardWidget(QWidget):
         hlayout.addWidget(keyboardLabel)
 
         self.keyboardVList = QComboBox()
-        self.keyboardVList.setFixedWidth(400)
+        self.keyboardVList.setFixedWidth(325)
         hlayout.addWidget(self.keyboardVList)
 
         self.testEdit = QLineEdit()
