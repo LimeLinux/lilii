@@ -282,11 +282,8 @@ class Install(QThread):
         buffer = open(self.mount_path+"/root"+"/etc/locale.gen").readlines()
         with open(self.mount_path+"/root"+"/etc/locale.gen", "w") as locale:
             for i in buffer:
-                if i.startswith("#{}".format(self.locale)):
-                    locale.write(self.locale + " " + self.locale.split(".")[-1] + "\n")
-
-                else:
-                    locale.write(i)
+                if i.startswith("#{}".format(self.locale.split(".")[0])):
+                    locale.write(i[1:])
 
             locale.flush()
             locale.close()
